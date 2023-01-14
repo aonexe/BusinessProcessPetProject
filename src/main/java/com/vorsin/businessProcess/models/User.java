@@ -1,4 +1,4 @@
-package models;
+package com.vorsin.businessProcess.models;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
