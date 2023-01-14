@@ -15,6 +15,7 @@
 	<description>Business process pet project</description>
 	<properties>
 		<java.version>19</java.version>
+		<modelmapper.version>2.4.4</modelmapper.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -56,6 +57,12 @@
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-test</artifactId>
 			<scope>test</scope>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.modelmapper/modelmapper -->
+		<dependency>
+			<groupId>org.modelmapper</groupId>
+			<artifactId>modelmapper</artifactId>
+			<version>${modelmapper.version}</version>
 		</dependency>
 	</dependencies>
 

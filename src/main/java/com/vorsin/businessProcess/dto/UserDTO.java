@@ -2,6 +2,7 @@ package com.vorsin.businessProcess.dto;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 import java.util.Date;
@@ -18,6 +19,12 @@ public class UserDTO {
 
     @DateTimeFormat(pattern = "dd/MM/yyyy" )
     private Date dateOfBirth;
+
+    @NotEmpty(message = "Email should be not empty")
+    @Email
+    private String email;
+
+    private String role;
 
     public String getFirstName() {
         return firstName;
@@ -41,5 +48,21 @@ public class UserDTO {
 
     public void setDateOfBirth(Date dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 }
