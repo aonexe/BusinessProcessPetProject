@@ -4,10 +4,13 @@ import com.vorsin.businessProcess.dto.UserDTO;
 import com.vorsin.businessProcess.models.User;
 import com.vorsin.businessProcess.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -24,6 +27,17 @@ public class UserController {
     @GetMapping
     public List<UserDTO> getUsers() {
         return userService.getUsers();
+    }
+
+    @PostMapping
+    public ResponseEntity<HttpStatus> createUser(@RequestBody @Valid UserDTO userDTO,
+                                                 BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            throw new RuntimeException();
+        }
+
+        userService.createUser(userDTO);
+        return ResponseEntity.ok(HttpStatus.OK);
     }
 
 
