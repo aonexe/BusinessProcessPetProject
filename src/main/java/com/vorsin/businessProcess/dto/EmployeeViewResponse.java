@@ -1,13 +1,14 @@
 package com.vorsin.businessProcess.dto;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Past;
+import jakarta.validation.constraints.Size;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Size;
 import java.util.Date;
 
-public class UserDTO {
+public class EmployeeViewResponse {
 
     @NotEmpty(message = "First name should be not empty")
     @Size(min = 2, max = 30, message = "First name should be between 2 and 30 characters")
@@ -17,14 +18,27 @@ public class UserDTO {
     @Size(min = 2, max = 30, message = "Last name should be between 2 and 30 characters")
     private String lastName;
 
-    @DateTimeFormat(pattern = "dd/MM/yyyy" )
+    @Past(message = "It's impossible")
+    @DateTimeFormat(pattern = "dd/MM/yyyy")
     private Date dateOfBirth;
 
     @NotEmpty(message = "Email should be not empty")
     @Email
     private String email;
 
-    private String role;
+    @NotEmpty(message = "Username should be not empty")
+    @Size(min = 2, max = 30, message = "Username should be between 2 and 30 characters")
+    private String username;
+
+    public EmployeeViewResponse() {}
+
+    public EmployeeViewResponse(String firstName, String lastName, Date dateOfBirth, String email, String username) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.dateOfBirth = dateOfBirth;
+        this.email = email;
+        this.username = username;
+    }
 
     public String getFirstName() {
         return firstName;
@@ -58,11 +72,11 @@ public class UserDTO {
         this.email = email;
     }
 
-    public String getRole() {
-        return role;
+    public String getUsername() {
+        return username;
     }
 
-    public void setRole(String role) {
-        this.role = role;
+    public void setUsername(String username) {
+        this.username = username;
     }
 }

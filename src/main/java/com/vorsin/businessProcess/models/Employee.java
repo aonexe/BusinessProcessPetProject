@@ -1,21 +1,27 @@
 package com.vorsin.businessProcess.models;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Past;
+import jakarta.validation.constraints.Size;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import javax.persistence.*;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Past;
-import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
-@Table(name = "user")
-public class User {
+@Table(name = "employee")
+public class Employee {
 
     @Id
-    @Column(name = "id")
+    @Column(name = "employee_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
@@ -29,10 +35,9 @@ public class User {
     @Size(min = 2, max = 30, message = "Last name should be between 2 and 30 characters")
     private String lastName;
 
-
     @Column(name = "date_of_birth")
-    @Past
-    @DateTimeFormat(pattern = "dd/MM/yyyy" )
+    @Past(message = "It's impossible")
+    @DateTimeFormat(pattern = "dd/MM/yyyy")
     private Date dateOfBirth;
 
     @Column(name = "email")
@@ -51,24 +56,35 @@ public class User {
     private String password;
 
     @Column(name = "role")
+    @NotEmpty(message = "Role should be not empty")
     private String role;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    @Column(name = "created_who")
+    @NotEmpty
+    @Size(max = 30, message = "Creator name should be less than 30 characters")
+    private String createdWho;
+
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @Column(name = "created_who")
-    @NotEmpty
-    private String createdWho;
+    @Column(name = "updated_who")
+    @Size(max = 30, message = "Updater name should be less than 30 characters")
+    private String updatedWho;
 
-    public User() {}
+    @OneToOne(mappedBy = "taskOwner")
+    private ProcessAction action;
 
-    public User(String firstName, String lastName, Date dateOfBirth, String username, String password) {
+
+    public Employee() {}
+
+    public Employee(String firstName, String lastName, Date dateOfBirth, String email, String username, String password) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.dateOfBirth = dateOfBirth;
+        this.email = email;
         this.username = username;
         this.password = password;
     }
@@ -129,12 +145,28 @@ public class User {
         this.password = password;
     }
 
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public String getCreatedWho() {
+        return createdWho;
+    }
+
+    public void setCreatedWho(String createdWho) {
+        this.createdWho = createdWho;
     }
 
     public LocalDateTime getUpdatedAt() {
@@ -145,11 +177,19 @@ public class User {
         this.updatedAt = updatedAt;
     }
 
-    public String getCreatedWho() {
-        return createdWho;
+    public String getUpdatedWho() {
+        return updatedWho;
     }
 
-    public void setCreatedWho(String createdWho) {
-        this.createdWho = createdWho;
+    public void setUpdatedWho(String updatedWho) {
+        this.updatedWho = updatedWho;
+    }
+
+    public ProcessAction getAction() {
+        return action;
+    }
+
+    public void setAction(ProcessAction action) {
+        this.action = action;
     }
 }
