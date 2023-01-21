@@ -8,7 +8,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 
-public class EmployeeRegistrationRequest {
+public class EmployeeUserRequest {
 
     @NotEmpty(message = "First name should be not empty")
     @Size(min = 2, max = 30, message = "First name should be between 2 and 30 characters")
@@ -34,9 +34,9 @@ public class EmployeeRegistrationRequest {
     @Size(min = 8, max = 50, message = "Password should be between 8 and 50 characters")
     private String password;
 
-    public EmployeeRegistrationRequest() {}
+    public EmployeeUserRequest() {}
 
-    public EmployeeRegistrationRequest(String firstName, String lastName, Date dateOfBirth, String email, String username, String password) {
+    public EmployeeUserRequest(String firstName, String lastName, Date dateOfBirth, String email, String username, String password) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.dateOfBirth = dateOfBirth;

@@ -30,34 +30,57 @@ public class BusinessProcessService {
     }
 
     public List<BusinessProcessDTO> getBusinessProcess() {
-        return businessProcessRepository.findAll().stream().map(this::convertToBusinessProcessViewResponse).collect(Collectors.toList());
+        return businessProcessRepository.findAll().stream().map(this::convertToBusinessProcessDTO).collect(Collectors.toList());
     }
 
 
     @Transactional
     public void createBusinessProcess(BusinessProcessDTO businessProcessDTO) {
-        Optional<BusinessProcess> businessProcess = businessProcessRepository.findByTitle(businessProcessDTO.getTitle());
-        if (businessProcess.isPresent()) {
+        if (isBusinessProcessPresent(businessProcessDTO.getTitle())) {
             //todo custom status
             throw new ResponseStatusException(HttpStatus.CONFLICT);
         } else {
             BusinessProcess newBusinessProcess = convertToBusinessProcess(businessProcessDTO);
-            enrichBusinessProcess(newBusinessProcess);
+            enrichNewBusinessProcess(newBusinessProcess);
             businessProcessRepository.save(newBusinessProcess);
         }
     }
 
     @Transactional
-    public void deleteBusinessProcess(int id) {
-        Optional<BusinessProcess> businessProcess = businessProcessRepository.findById(id);
-        if (businessProcess.isPresent()) {
-            businessProcessRepository.deleteById(businessProcess.get().getId());
+    public void updateBusinessProcess(BusinessProcessDTO businessProcessDTO, int id) {
+        if (isBusinessProcessPresent(id)) {
+
+            //todo одинаковые тайтлы 500
+            BusinessProcess businessProcess = convertToBusinessProcess(businessProcessDTO, id);
+            enrichBusinessProcess(businessProcess, id);
+            businessProcessRepository.save(businessProcess);
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
     }
 
-    private BusinessProcessDTO convertToBusinessProcessViewResponse(BusinessProcess businessProcess) {
+    @Transactional
+    public void deleteBusinessProcess(int id) {
+        if (isBusinessProcessPresent(id)) {
+            BusinessProcess businessProcess = businessProcessRepository.findById(id).get();
+            businessProcessRepository.deleteById(businessProcess.getId());
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    private boolean isBusinessProcessPresent(int id) {
+        Optional<BusinessProcess> businessProcess = businessProcessRepository.findById(id);
+        return businessProcess.isPresent();
+    }
+
+    private boolean isBusinessProcessPresent(String title) {
+        Optional<BusinessProcess> businessProcess = businessProcessRepository.findByTitle(title);
+        return businessProcess.isPresent();
+    }
+
+
+    private BusinessProcessDTO convertToBusinessProcessDTO(BusinessProcess businessProcess) {
         return modelMapper.map(businessProcess, BusinessProcessDTO.class);
     }
 
@@ -65,8 +88,28 @@ public class BusinessProcessService {
         return modelMapper.map(businessProcessDTO, BusinessProcess.class);
     }
 
-    private void enrichBusinessProcess(BusinessProcess businessProcess) {
+    private BusinessProcess convertToBusinessProcess(BusinessProcessDTO businessProcessDTO, int id) {
+        BusinessProcess businessProcess = convertToBusinessProcess(businessProcessDTO);
+
+        return businessProcess;
+    }
+
+    private void enrichNewBusinessProcess(BusinessProcess businessProcess) {
         businessProcess.setCreatedAt(LocalDateTime.now());
+
+        //todo
         businessProcess.setCreatedWho("ROLE_ADMIN");
     }
+
+    private void enrichBusinessProcess(BusinessProcess newBusinessProcess, int id) {
+        BusinessProcess oldBusinessProcess = businessProcessRepository.findById(id).get();
+        newBusinessProcess.setId(oldBusinessProcess.getId());
+        newBusinessProcess.setCreatedAt(oldBusinessProcess.getCreatedAt());
+        newBusinessProcess.setCreatedWho(oldBusinessProcess.getCreatedWho());
+
+        //todo
+        newBusinessProcess.setUpdatedAt(LocalDateTime.now());
+        newBusinessProcess.setUpdatedWho("Updater");
+    }
+
 }

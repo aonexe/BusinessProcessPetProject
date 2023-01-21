@@ -1,19 +1,18 @@
 package com.vorsin.businessProcess.dto;
 
+
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 
-
-public class BusinessProcessDTO {
+public class StageDTO {
 
     @NotEmpty
     @Size(max = 30, message = "Title should be less than 30 characters")
     private String title;
 
-    public BusinessProcessDTO() {
-    }
+    public StageDTO() {}
 
-    public BusinessProcessDTO(String title) {
+    public StageDTO(String title) {
         this.title = title;
     }
 

@@ -43,7 +43,7 @@ public class BusinessProcess {
     private String updatedWho;
 
     @OneToMany(mappedBy = "businessProcess")
-    private List<ProcessStage> stages;
+    private List<Stage> stages;
 
     public BusinessProcess() {}
 
@@ -106,11 +106,11 @@ public class BusinessProcess {
         this.updatedWho = updatedWho;
     }
 
-    public List<ProcessStage> getStages() {
+    public List<Stage> getStages() {
         return stages;
     }
 
-    public void setStages(List<ProcessStage> stages) {
+    public void setStages(List<Stage> stages) {
         this.stages = stages;
     }
 }

@@ -16,7 +16,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "process_stage")
-public class ProcessStage {
+public class Stage {
 
     @Id
     @Column(name = "stage_id")
@@ -39,9 +39,9 @@ public class ProcessStage {
     private List<ProcessAction> actions;
 
 
-    public ProcessStage() {}
+    public Stage() {}
 
-    public ProcessStage(String title) {
+    public Stage(String title) {
         this.title = title;
     }
 

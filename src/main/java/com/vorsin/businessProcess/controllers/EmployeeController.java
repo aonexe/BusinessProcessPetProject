@@ -1,16 +1,23 @@
 package com.vorsin.businessProcess.controllers;
 
 
+import com.vorsin.businessProcess.dto.EmployeeUserRequest;
 import com.vorsin.businessProcess.dto.EmployeeViewResponse;
-import com.vorsin.businessProcess.dto.EmployeeRegistrationRequest;
 import com.vorsin.businessProcess.services.EmployeeService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
-
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -31,13 +38,22 @@ public class EmployeeController {
     }
 
     @PostMapping("/registration")
-    public ResponseEntity<HttpStatus> createEmployee(@RequestBody @Valid EmployeeRegistrationRequest employeeDTO,
+    public ResponseEntity<HttpStatus> createEmployee(@RequestBody @Valid EmployeeUserRequest employeeUserRequest,
                                                      BindingResult bindingResult) {
+
+        //todo перенести логику в сервис
         if (bindingResult.hasErrors()) {
-            System.out.println(bindingResult.getModel());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
 
-        employeeService.createEmployee(employeeDTO);
+        employeeService.createEmployee(employeeUserRequest);
+        return ResponseEntity.ok(HttpStatus.OK);
+    }
+
+    @PatchMapping("/{username}")
+    public ResponseEntity<HttpStatus> updateEmployee(@RequestBody @Valid EmployeeUserRequest employeeUserRequest,
+                                                     @PathVariable("username") String username) {
+        employeeService.updateEmployee(employeeUserRequest, username);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
@@ -46,4 +62,6 @@ public class EmployeeController {
         employeeService.deleteEmployee(username);
         return ResponseEntity.ok(HttpStatus.OK);
     }
+
+
 }

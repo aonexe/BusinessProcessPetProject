@@ -19,7 +19,7 @@ public class ProcessAction {
 
     @ManyToOne
     @JoinColumn(name = "stage_id", referencedColumnName = "stage_id")
-    private ProcessStage stage;
+    private Stage stage;
 
     @OneToOne
     @JoinColumn(name = "task_owner_id", referencedColumnName = "employee_id")
@@ -51,11 +51,11 @@ public class ProcessAction {
         this.actionResult = actionResult;
     }
 
-    public ProcessStage getStage() {
+    public Stage getStage() {
         return stage;
     }
 
-    public void setStage(ProcessStage stage) {
+    public void setStage(Stage stage) {
         this.stage = stage;
     }
 
