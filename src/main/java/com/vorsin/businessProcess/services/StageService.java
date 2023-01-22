@@ -3,6 +3,7 @@ package com.vorsin.businessProcess.services;
 import com.vorsin.businessProcess.dto.StageDTO;
 import com.vorsin.businessProcess.models.BusinessProcess;
 import com.vorsin.businessProcess.models.Stage;
+import com.vorsin.businessProcess.models.StageResult;
 import com.vorsin.businessProcess.repositories.BusinessProcessRepository;
 import com.vorsin.businessProcess.repositories.StageRepository;
 import org.modelmapper.ModelMapper;
@@ -79,7 +80,7 @@ public class StageService {
     private void enrichNewStage(int businessProcessId, Stage stage) {
         Optional<BusinessProcess> businessProcess = businessProcessRepository.findById(businessProcessId);
         if (businessProcess.isPresent()) {
-            stage.setStageResult(false);
+            stage.setStageResult(StageResult.NOT_STARTED);
             stage.setBusinessProcess(businessProcess.get());
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);

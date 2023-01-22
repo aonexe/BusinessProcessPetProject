@@ -12,6 +12,7 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -29,7 +30,22 @@ public class Stage {
     private String title;
 
     @Column(name = "stage_result")
-    private boolean stageResult;
+    private StageResult stageResult;
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @Column(name = "created_who")
+    @NotEmpty
+    @Size(max = 30, message = "Creator name should be less than 30 characters")
+    private String createdWho;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    @Column(name = "updated_who")
+    @Size(max = 30, message = "Updater name should be less than 30 characters")
+    private int updatedWho;
 
     @ManyToOne
     @JoinColumn(name = "process_id", referencedColumnName = "process_id")
@@ -61,12 +77,44 @@ public class Stage {
         this.title = title;
     }
 
-    public boolean isStageResult() {
+    public StageResult getStageResult() {
         return stageResult;
     }
 
-    public void setStageResult(boolean stageResult) {
+    public void setStageResult(StageResult stageResult) {
         this.stageResult = stageResult;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public String getCreatedWho() {
+        return createdWho;
+    }
+
+    public void setCreatedWho(String createdWho) {
+        this.createdWho = createdWho;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public int getUpdatedWho() {
+        return updatedWho;
+    }
+
+    public void setUpdatedWho(int updatedWho) {
+        this.updatedWho = updatedWho;
     }
 
     public BusinessProcess getBusinessProcess() {
@@ -75,6 +123,14 @@ public class Stage {
 
     public void setBusinessProcess(BusinessProcess businessProcess) {
         this.businessProcess = businessProcess;
+    }
+
+    public List<ProcessAction> getActions() {
+        return actions;
+    }
+
+    public void setActions(List<ProcessAction> actions) {
+        this.actions = actions;
     }
 }
 

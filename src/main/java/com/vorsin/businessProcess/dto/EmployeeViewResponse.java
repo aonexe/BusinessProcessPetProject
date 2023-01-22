@@ -10,6 +10,8 @@ import java.util.Date;
 
 public class EmployeeViewResponse {
 
+    private int id;
+
     @NotEmpty(message = "First name should be not empty")
     @Size(min = 2, max = 30, message = "First name should be between 2 and 30 characters")
     private String firstName;
@@ -30,14 +32,24 @@ public class EmployeeViewResponse {
     @Size(min = 2, max = 30, message = "Username should be between 2 and 30 characters")
     private String username;
 
-    public EmployeeViewResponse() {}
+    public EmployeeViewResponse() {
+    }
 
-    public EmployeeViewResponse(String firstName, String lastName, Date dateOfBirth, String email, String username) {
+    public EmployeeViewResponse(int id, String firstName, String lastName, Date dateOfBirth, String email, String username) {
+        this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.dateOfBirth = dateOfBirth;
         this.email = email;
         this.username = username;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getFirstName() {

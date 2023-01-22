@@ -40,19 +40,13 @@ public class BusinessProcess {
 
     @Column(name = "updated_who")
     @Size(max = 30, message = "Updater name should be less than 30 characters")
-    private String updatedWho;
+    private int updatedWho;
 
     @OneToMany(mappedBy = "businessProcess")
     private List<Stage> stages;
 
     public BusinessProcess() {}
 
-    public BusinessProcess( String title, LocalDateTime createdAt, String createdWho) {
-        this.title = title;
-        this.createdAt = createdAt;
-        this.createdWho = createdWho;
-
-    }
 
     public BusinessProcess(String title) {
         this.title = title;
@@ -98,11 +92,11 @@ public class BusinessProcess {
         this.updatedAt = updatedAt;
     }
 
-    public String getUpdatedWho() {
+    public int getUpdatedWho() {
         return updatedWho;
     }
 
-    public void setUpdatedWho(String updatedWho) {
+    public void setUpdatedWho(int updatedWho) {
         this.updatedWho = updatedWho;
     }
 

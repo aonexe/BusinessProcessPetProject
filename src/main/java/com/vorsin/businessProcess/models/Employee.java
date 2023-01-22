@@ -57,7 +57,7 @@ public class Employee {
 
     @Column(name = "role")
     @NotEmpty(message = "Role should be not empty")
-    private String role;
+    private UserRole userRole;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -72,8 +72,9 @@ public class Employee {
 
     @Column(name = "updated_who")
     @Size(max = 30, message = "Updater name should be less than 30 characters")
-    private String updatedWho;
+    private int updatedWho;
 
+    //todo one to many
     @OneToOne(mappedBy = "taskOwner")
     private ProcessAction action;
 
@@ -145,12 +146,12 @@ public class Employee {
         this.password = password;
     }
 
-    public String getRole() {
-        return role;
+    public UserRole getUserRole() {
+        return userRole;
     }
 
-    public void setRole(String role) {
-        this.role = role;
+    public void setUserRole(UserRole userRole) {
+        this.userRole = userRole;
     }
 
     public LocalDateTime getCreatedAt() {
@@ -177,11 +178,11 @@ public class Employee {
         this.updatedAt = updatedAt;
     }
 
-    public String getUpdatedWho() {
+    public int getUpdatedWho() {
         return updatedWho;
     }
 
-    public void setUpdatedWho(String updatedWho) {
+    public void setUpdatedWho(int updatedWho) {
         this.updatedWho = updatedWho;
     }
 
