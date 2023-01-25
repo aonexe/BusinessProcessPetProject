@@ -3,6 +3,7 @@ package com.vorsin.businessProcess.services;
 
 import com.vorsin.businessProcess.dto.BusinessProcessDTO;
 import com.vorsin.businessProcess.models.BusinessProcess;
+import com.vorsin.businessProcess.models.User;
 import com.vorsin.businessProcess.repositories.BusinessProcessRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -109,7 +110,7 @@ public class BusinessProcessService {
 
         //todo
         newBusinessProcess.setUpdatedAt(LocalDateTime.now());
-        newBusinessProcess.setUpdatedWho("Updater");
+        newBusinessProcess.setUpdatedWho(new User());
     }
 
 }

@@ -3,7 +3,7 @@ package com.vorsin.businessProcess.controllers;
 
 import com.vorsin.businessProcess.dto.EmployeeUserRequest;
 import com.vorsin.businessProcess.dto.EmployeeViewResponse;
-import com.vorsin.businessProcess.services.EmployeeService;
+import com.vorsin.businessProcess.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,22 +23,22 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/employee")
-public class EmployeeController {
+public class UserController {
 
-    private final EmployeeService employeeService;
+    private final UserService userService;
 
     @Autowired
-    public EmployeeController(EmployeeService employeeService) {
-        this.employeeService = employeeService;
+    public UserController(UserService userService) {
+        this.userService = userService;
     }
 
     @GetMapping
     public List<EmployeeViewResponse> getUsers() {
-        return employeeService.getUsers();
+        return userService.getUsers();
     }
 
     @PostMapping("/registration")
-    public ResponseEntity<HttpStatus> createEmployee(@RequestBody @Valid EmployeeUserRequest employeeUserRequest,
+    public ResponseEntity<HttpStatus> createUser(@RequestBody @Valid EmployeeUserRequest employeeUserRequest,
                                                      BindingResult bindingResult) {
 
         //todo перенести логику в сервис
@@ -46,20 +46,20 @@ public class EmployeeController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
 
-        employeeService.createEmployee(employeeUserRequest);
+        userService.createUser(employeeUserRequest);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @PatchMapping("/{username}")
     public ResponseEntity<HttpStatus> updateEmployee(@RequestBody @Valid EmployeeUserRequest employeeUserRequest,
                                                      @PathVariable("username") String username) {
-        employeeService.updateEmployee(employeeUserRequest, username);
+        userService.updateUser(employeeUserRequest, username);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @DeleteMapping("/{username}")
     public ResponseEntity<HttpStatus> deleteEmployee(@PathVariable("username") String username) {
-        employeeService.deleteEmployee(username);
+        userService.deleteUser(username);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 

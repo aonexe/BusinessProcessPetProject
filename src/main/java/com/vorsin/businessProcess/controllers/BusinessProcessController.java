@@ -1,8 +1,6 @@
 package com.vorsin.businessProcess.controllers;
 
 import com.vorsin.businessProcess.dto.BusinessProcessDTO;
-import com.vorsin.businessProcess.dto.EmployeeUserRequest;
-import com.vorsin.businessProcess.models.BusinessProcess;
 import com.vorsin.businessProcess.services.BusinessProcessService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;

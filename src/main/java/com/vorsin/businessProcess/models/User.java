@@ -2,9 +2,11 @@ package com.vorsin.businessProcess.models;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
@@ -17,11 +19,11 @@ import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
-@Table(name = "employee")
-public class Employee {
+@Table(name = "user")
+public class User {
 
     @Id
-    @Column(name = "employee_id")
+    @Column(name = "user_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
@@ -72,16 +74,17 @@ public class Employee {
 
     @Column(name = "updated_who")
     @Size(max = 30, message = "Updater name should be less than 30 characters")
-    private int updatedWho;
+    @OneToOne(fetch = FetchType.LAZY)
+    private User updatedWho;
 
     //todo one to many
     @OneToOne(mappedBy = "taskOwner")
     private ProcessAction action;
 
 
-    public Employee() {}
+    public User() {}
 
-    public Employee(String firstName, String lastName, Date dateOfBirth, String email, String username, String password) {
+    public User(String firstName, String lastName, Date dateOfBirth, String email, String username, String password) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.dateOfBirth = dateOfBirth;
@@ -178,11 +181,11 @@ public class Employee {
         this.updatedAt = updatedAt;
     }
 
-    public int getUpdatedWho() {
+    public User getUpdatedWho() {
         return updatedWho;
     }
 
-    public void setUpdatedWho(int updatedWho) {
+    public void setUpdatedWho(User updatedWho) {
         this.updatedWho = updatedWho;
     }
 

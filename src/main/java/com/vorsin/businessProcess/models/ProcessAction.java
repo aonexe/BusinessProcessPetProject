@@ -22,8 +22,8 @@ public class ProcessAction {
     private Stage stage;
 
     @OneToOne
-    @JoinColumn(name = "task_owner_id", referencedColumnName = "employee_id")
-    private Employee taskOwner;
+    @JoinColumn(name = "task_owner_id", referencedColumnName = "user_id")
+    private User taskOwner;
 
    public ProcessAction() {}
 
@@ -59,11 +59,11 @@ public class ProcessAction {
         this.stage = stage;
     }
 
-    public Employee getTaskOwner() {
+    public User getTaskOwner() {
         return taskOwner;
     }
 
-    public void setTaskOwner(Employee taskOwner) {
+    public void setTaskOwner(User taskOwner) {
         this.taskOwner = taskOwner;
     }
 }
