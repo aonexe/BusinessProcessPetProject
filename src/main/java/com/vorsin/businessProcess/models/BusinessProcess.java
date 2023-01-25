@@ -2,10 +2,12 @@ package com.vorsin.businessProcess.models;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
@@ -40,7 +42,8 @@ public class BusinessProcess {
 
     @Column(name = "updated_who")
     @Size(max = 30, message = "Updater name should be less than 30 characters")
-    private int updatedWho;
+    @OneToOne(fetch = FetchType.LAZY)
+    private User updatedWho;
 
     @OneToMany(mappedBy = "businessProcess")
     private List<Stage> stages;
@@ -92,11 +95,11 @@ public class BusinessProcess {
         this.updatedAt = updatedAt;
     }
 
-    public int getUpdatedWho() {
+    public User getUpdatedWho() {
         return updatedWho;
     }
 
-    public void setUpdatedWho(int updatedWho) {
+    public void setUpdatedWho(User updatedWho) {
         this.updatedWho = updatedWho;
     }
 
