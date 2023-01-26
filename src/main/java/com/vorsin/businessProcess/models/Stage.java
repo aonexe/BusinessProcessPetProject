@@ -2,6 +2,8 @@ package com.vorsin.businessProcess.models;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -30,7 +32,8 @@ public class Stage {
     private String title;
 
     @Column(name = "stage_result")
-    private StageResult stageResult;
+    @Enumerated(EnumType.STRING)
+    private StageResultEnum stageResult;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -77,11 +80,11 @@ public class Stage {
         this.title = title;
     }
 
-    public StageResult getStageResult() {
+    public StageResultEnum getStageResult() {
         return stageResult;
     }
 
-    public void setStageResult(StageResult stageResult) {
+    public void setStageResult(StageResultEnum stageResult) {
         this.stageResult = stageResult;
     }
 

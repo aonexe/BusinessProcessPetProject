@@ -1,7 +1,9 @@
 package com.vorsin.businessProcess.dto;
 
 import com.vorsin.businessProcess.models.User;
-import com.vorsin.businessProcess.models.UserRole;
+import com.vorsin.businessProcess.models.UserRoleEnum;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToOne;
 import jakarta.validation.constraints.Email;
@@ -37,8 +39,9 @@ public class UserViewResponse {
     @Size(min = 2, max = 30, message = "Username should be between 2 and 30 characters")
     private String username;
 
-    @NotEmpty(message = "Role should be not empty")
-    private UserRole userRole;
+
+    @Enumerated(EnumType.STRING)
+    private UserRoleEnum userRole;
 
     private LocalDateTime createdAt;
 
@@ -46,7 +49,6 @@ public class UserViewResponse {
     private String createdWho;
 
     private LocalDateTime updatedAt;
-
 
     @OneToOne(fetch = FetchType.LAZY)
     private User updatedWho;
@@ -111,11 +113,11 @@ public class UserViewResponse {
         this.username = username;
     }
 
-    public UserRole getUserRole() {
+    public UserRoleEnum getUserRole() {
         return userRole;
     }
 
-    public void setUserRole(UserRole userRole) {
+    public void setUserRole(UserRoleEnum userRole) {
         this.userRole = userRole;
     }
 

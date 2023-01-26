@@ -49,18 +49,17 @@ public class UserController {
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
-    @PatchMapping("/{username}")
+    @PatchMapping("/{id}")
     public ResponseEntity<HttpStatus> updateUser(@RequestBody @Valid UserRequest userRequest,
-                                                 @PathVariable("username") String username) {
-        userService.updateUser(userRequest, username);
+                                                 @PathVariable("id") int id) {
+        userService.updateUser(userRequest, id);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
-    @DeleteMapping("/{username}")
-    public ResponseEntity<HttpStatus> deleteUser(@PathVariable("username") String username) {
-        userService.deleteUser(username);
+    @DeleteMapping("/{id}")
+    public ResponseEntity<HttpStatus> deleteUser(@PathVariable("id") int id) {
+        userService.deleteUser(id);
         return ResponseEntity.ok(HttpStatus.OK);
     }
-
 
 }

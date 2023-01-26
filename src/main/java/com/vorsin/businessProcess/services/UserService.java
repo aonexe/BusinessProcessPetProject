@@ -3,7 +3,7 @@ package com.vorsin.businessProcess.services;
 import com.vorsin.businessProcess.dto.UserRequest;
 import com.vorsin.businessProcess.dto.UserViewResponse;
 import com.vorsin.businessProcess.models.User;
-import com.vorsin.businessProcess.models.UserRole;
+import com.vorsin.businessProcess.models.UserRoleEnum;
 import com.vorsin.businessProcess.repositories.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +12,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.beans.IntrospectionException;
+import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -37,7 +40,7 @@ public class UserService {
 
     @Transactional
     public void createUser(UserRequest userRequest) {
-        if (isUserPresent(userRequest.getUsername())) {
+        if (userRepository.findByUsername(userRequest.getUsername()).isPresent()) {
             //todo custom status
             throw new ResponseStatusException(HttpStatus.CONFLICT);
         } else {
@@ -48,10 +51,10 @@ public class UserService {
     }
 
     @Transactional
-    public void updateUser(UserRequest userRequest, String username) {
-        if (isUserPresent(username)) {
+    public void updateUser(UserRequest userRequest, int id) {
+        if (userRepository.findById(id).isPresent()) {
             //todo одинаковые юзернеймы или емэйлы
-            User user = userRepository.findByUsername(username).get();
+            User user = userRepository.findById(id).get();
             initUser(user, userRequest);
             userRepository.save(user);
         } else {
@@ -59,17 +62,15 @@ public class UserService {
         }
     }
 
-
     @Transactional
-    public void deleteUser(String username) {
-        if (isUserPresent(username)) {
-            User employee = userRepository.findByUsername(username).get();
-            userRepository.deleteById(employee.getId());
+    public void deleteUser(int id) {
+        if (isUserPresent(id)) {
+            userRepository.deleteById(id);
         }
     }
 
-    private boolean isUserPresent(String username) {
-        Optional<User> employee = userRepository.findByUsername(username);
+    private boolean isUserPresent(int id) {
+        Optional<User> employee = userRepository.findById(id);
         return employee.isPresent();
     }
 
@@ -83,19 +84,33 @@ public class UserService {
         newUser.setCreatedAt(LocalDateTime.now());
         //todo
         newUser.setCreatedWho("ROLE_ADMIN");
-        newUser.setUserRole(UserRole.USER);
+        newUser.setUserRole(UserRoleEnum.USER);
     }
 
     private void initUser(User user, UserRequest userRequest) {
-        for (Field u: userRequest.getClass().getDeclaredFields()) {
-            if (u!=null) {
-                System.out.println(u.toString());
+
+        Class<?> objClass = userRequest.getClass();
+        for (Field field : objClass.getDeclaredFields()) {
+            // Invoke the getter method on the UserRequest object.
+            Object objField;
+            try {
+                objField = new PropertyDescriptor(field.getName(),
+                        UserRequest.class).getReadMethod().invoke(userRequest);
+            } catch (IllegalAccessException | InvocationTargetException | IntrospectionException e) {
+                throw new RuntimeException(e);
+            }
+
+            // Invoke the setter method on the User object.
+            try {
+                new PropertyDescriptor(field.getName(), User.class)
+                        .getWriteMethod().invoke(user, objField);
+            } catch (IllegalAccessException | InvocationTargetException | IntrospectionException e) {
+                throw new RuntimeException(e);
             }
         }
 
-        //todo
         user.setUpdatedAt(LocalDateTime.now());
-        user.setUpdatedWho(new User());
+        //todo current user from auth
+        user.setUpdatedWho(userRepository.findByUsername("aonexe").get());
     }
-
 }

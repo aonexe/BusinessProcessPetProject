@@ -1,6 +1,7 @@
 package com.vorsin.businessProcess.models;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -60,10 +61,9 @@ public class User {
     @Size(min = 8, max = 50, message = "Password should be between 8 and 50 characters")
     private String password;
 
-    @Column(name = "role",columnDefinition = "user_role")
+    @Column(name = "user_role")
     @Enumerated(EnumType.STRING)
-
-    private UserRole userRole;
+    private UserRoleEnum userRole;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -151,11 +151,11 @@ public class User {
         this.password = password;
     }
 
-    public UserRole getUserRole() {
+    public UserRoleEnum getUserRole() {
         return userRole;
     }
 
-    public void setUserRole(UserRole userRole) {
+    public void setUserRole(UserRoleEnum userRole) {
         this.userRole = userRole;
     }
 
