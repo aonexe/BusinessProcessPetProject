@@ -2,6 +2,8 @@ package com.vorsin.businessProcess.models;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -13,6 +15,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Size;
+import org.hibernate.annotations.Type;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
@@ -57,8 +60,9 @@ public class User {
     @Size(min = 8, max = 50, message = "Password should be between 8 and 50 characters")
     private String password;
 
-    @Column(name = "role")
-    @NotEmpty(message = "Role should be not empty")
+    @Column(name = "role",columnDefinition = "user_role")
+    @Enumerated(EnumType.STRING)
+
     private UserRole userRole;
 
     @Column(name = "created_at")
@@ -66,14 +70,12 @@ public class User {
 
     @Column(name = "created_who")
     @NotEmpty
-    @Size(max = 30, message = "Creator name should be less than 30 characters")
     private String createdWho;
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @Column(name = "updated_who")
-    @Size(max = 30, message = "Updater name should be less than 30 characters")
+    @JoinColumn(name = "updated_who", referencedColumnName = "user_id")
     @OneToOne(fetch = FetchType.LAZY)
     private User updatedWho;
 

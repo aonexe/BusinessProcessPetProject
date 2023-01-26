@@ -1,14 +1,21 @@
 package com.vorsin.businessProcess.dto;
 
+import com.vorsin.businessProcess.models.User;
+import com.vorsin.businessProcess.models.UserRole;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.OneToOne;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Size;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
-public class EmployeeUserRequest {
+public class UserViewResponse {
+
+    private int id;
 
     @NotEmpty(message = "First name should be not empty")
     @Size(min = 2, max = 30, message = "First name should be between 2 and 30 characters")
@@ -30,19 +37,38 @@ public class EmployeeUserRequest {
     @Size(min = 2, max = 30, message = "Username should be between 2 and 30 characters")
     private String username;
 
-    @NotEmpty(message = "Password should be not empty")
-    @Size(min = 8, max = 50, message = "Password should be between 8 and 50 characters")
-    private String password;
+    @NotEmpty(message = "Role should be not empty")
+    private UserRole userRole;
 
-    public EmployeeUserRequest() {}
+    private LocalDateTime createdAt;
 
-    public EmployeeUserRequest(String firstName, String lastName, Date dateOfBirth, String email, String username, String password) {
+    @NotEmpty
+    private String createdWho;
+
+    private LocalDateTime updatedAt;
+
+
+    @OneToOne(fetch = FetchType.LAZY)
+    private User updatedWho;
+
+    public UserViewResponse() {
+    }
+
+    public UserViewResponse(int id, String firstName, String lastName, Date dateOfBirth, String email, String username) {
+        this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.dateOfBirth = dateOfBirth;
         this.email = email;
         this.username = username;
-        this.password = password;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getFirstName() {
@@ -85,11 +111,43 @@ public class EmployeeUserRequest {
         this.username = username;
     }
 
-    public String getPassword() {
-        return password;
+    public UserRole getUserRole() {
+        return userRole;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setUserRole(UserRole userRole) {
+        this.userRole = userRole;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public String getCreatedWho() {
+        return createdWho;
+    }
+
+    public void setCreatedWho(String createdWho) {
+        this.createdWho = createdWho;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public User getUpdatedWho() {
+        return updatedWho;
+    }
+
+    public void setUpdatedWho(User updatedWho) {
+        this.updatedWho = updatedWho;
     }
 }

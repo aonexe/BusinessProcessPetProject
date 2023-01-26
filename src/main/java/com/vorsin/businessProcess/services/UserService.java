@@ -1,7 +1,7 @@
 package com.vorsin.businessProcess.services;
 
-import com.vorsin.businessProcess.dto.EmployeeUserRequest;
-import com.vorsin.businessProcess.dto.EmployeeViewResponse;
+import com.vorsin.businessProcess.dto.UserRequest;
+import com.vorsin.businessProcess.dto.UserViewResponse;
 import com.vorsin.businessProcess.models.User;
 import com.vorsin.businessProcess.models.UserRole;
 import com.vorsin.businessProcess.repositories.UserRepository;
@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.lang.reflect.Field;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -30,29 +31,29 @@ public class UserService {
         this.modelMapper = modelMapper;
     }
 
-    public List<EmployeeViewResponse> getUsers() {
-        return userRepository.findAll().stream().map(this::convertToEmployeeViewResponse).collect(Collectors.toList());
+    public List<UserViewResponse> getUsers() {
+        return userRepository.findAll().stream().map(this::convertToUserViewResponse).collect(Collectors.toList());
     }
 
     @Transactional
-    public void createUser(EmployeeUserRequest employeeUserRequest) {
-        if (isUserPresent(employeeUserRequest.getUsername())) {
+    public void createUser(UserRequest userRequest) {
+        if (isUserPresent(userRequest.getUsername())) {
             //todo custom status
             throw new ResponseStatusException(HttpStatus.CONFLICT);
         } else {
-            User newEmployee = convertToEmployee(employeeUserRequest);
-            enrichNewEmployee(newEmployee);
-            userRepository.save(newEmployee);
+            User newUser = modelMapper.map(userRequest, User.class);
+            initNewUser(newUser);
+            userRepository.save(newUser);
         }
     }
 
     @Transactional
-    public void updateUser(EmployeeUserRequest employeeUserRequest, String username) {
+    public void updateUser(UserRequest userRequest, String username) {
         if (isUserPresent(username)) {
             //todo одинаковые юзернеймы или емэйлы
-            User employee = convertToEmployee(employeeUserRequest);
-            enrichEmployee(employee, username);
-            userRepository.save(employee);
+            User user = userRepository.findByUsername(username).get();
+            initUser(user, userRequest);
+            userRepository.save(user);
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
@@ -72,33 +73,29 @@ public class UserService {
         return employee.isPresent();
     }
 
-    private EmployeeViewResponse convertToEmployeeViewResponse(User employee) {
-        return modelMapper.map(employee, EmployeeViewResponse.class);
-    }
-
-    private User convertToEmployee(EmployeeUserRequest employeeUserRequest) {
-        User employee = modelMapper.map(employeeUserRequest, User.class);
-        return employee;
+    private UserViewResponse convertToUserViewResponse(User user) {
+        return modelMapper.map(user, UserViewResponse.class);
     }
 
 
     //todo
-    private void enrichNewEmployee(User newEmployee) {
-        newEmployee.setCreatedAt(LocalDateTime.now());
+    private void initNewUser(User newUser) {
+        newUser.setCreatedAt(LocalDateTime.now());
         //todo
-        newEmployee.setCreatedWho("ROLE_ADMIN");
-        newEmployee.setUserRole(UserRole.USER);
+        newUser.setCreatedWho("ROLE_ADMIN");
+        newUser.setUserRole(UserRole.USER);
     }
 
-    private void enrichEmployee(User newEmployee, String username) {
-        User oldEmployee = userRepository.findByUsername(username).get();
-        newEmployee.setId(oldEmployee.getId());
-        newEmployee.setUserRole(oldEmployee.getUserRole());
-        newEmployee.setCreatedAt(oldEmployee.getCreatedAt());
-        newEmployee.setCreatedWho(oldEmployee.getCreatedWho());
+    private void initUser(User user, UserRequest userRequest) {
+        for (Field u: userRequest.getClass().getDeclaredFields()) {
+            if (u!=null) {
+                System.out.println(u.toString());
+            }
+        }
+
         //todo
-        newEmployee.setUpdatedAt(LocalDateTime.now());
-        newEmployee.setUpdatedWho(new User());
+        user.setUpdatedAt(LocalDateTime.now());
+        user.setUpdatedWho(new User());
     }
 
 }

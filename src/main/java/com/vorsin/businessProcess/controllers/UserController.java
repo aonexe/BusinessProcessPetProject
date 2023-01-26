@@ -1,8 +1,7 @@
 package com.vorsin.businessProcess.controllers;
 
-
-import com.vorsin.businessProcess.dto.EmployeeUserRequest;
-import com.vorsin.businessProcess.dto.EmployeeViewResponse;
+import com.vorsin.businessProcess.dto.UserRequest;
+import com.vorsin.businessProcess.dto.UserViewResponse;
 import com.vorsin.businessProcess.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +21,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/employee")
+@RequestMapping("/users")
 public class UserController {
 
     private final UserService userService;
@@ -33,12 +32,12 @@ public class UserController {
     }
 
     @GetMapping
-    public List<EmployeeViewResponse> getUsers() {
+    public List<UserViewResponse> getUsers() {
         return userService.getUsers();
     }
 
-    @PostMapping("/registration")
-    public ResponseEntity<HttpStatus> createUser(@RequestBody @Valid EmployeeUserRequest employeeUserRequest,
+    @PostMapping("/new")
+    public ResponseEntity<HttpStatus> createUser(@RequestBody @Valid UserRequest userRequest,
                                                      BindingResult bindingResult) {
 
         //todo перенести логику в сервис
@@ -46,19 +45,19 @@ public class UserController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
 
-        userService.createUser(employeeUserRequest);
+        userService.createUser(userRequest);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @PatchMapping("/{username}")
-    public ResponseEntity<HttpStatus> updateEmployee(@RequestBody @Valid EmployeeUserRequest employeeUserRequest,
-                                                     @PathVariable("username") String username) {
-        userService.updateUser(employeeUserRequest, username);
+    public ResponseEntity<HttpStatus> updateUser(@RequestBody @Valid UserRequest userRequest,
+                                                 @PathVariable("username") String username) {
+        userService.updateUser(userRequest, username);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @DeleteMapping("/{username}")
-    public ResponseEntity<HttpStatus> deleteEmployee(@PathVariable("username") String username) {
+    public ResponseEntity<HttpStatus> deleteUser(@PathVariable("username") String username) {
         userService.deleteUser(username);
         return ResponseEntity.ok(HttpStatus.OK);
     }

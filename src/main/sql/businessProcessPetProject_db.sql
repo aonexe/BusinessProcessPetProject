@@ -10,11 +10,12 @@ CREATE TABLE bp_user
     email         VARCHAR(100) UNIQUE NOT NULL,
     username      VARCHAR(30) UNIQUE  NOT NULL,
     password      VARCHAR(50)         NOT NULL,
-    role          user_role           NOT NULL,
+    user_role     user_role           NOT NULL,
     created_at    TIMESTAMP           NOT NULL,
     created_who   VARCHAR(30)         NOT NULL,
     updated_at    TIMESTAMP,
-    updated_who   int references bp_user (user_id)
+    updated_who   INT DEFAULT NULL,
+    FOREIGN KEY (updated_who) REFERENCES bp_user (user_id)
 );
 
 CREATE TABLE business_process
@@ -24,7 +25,8 @@ CREATE TABLE business_process
     created_at  TIMESTAMP          NOT NULL,
     created_who VARCHAR(30)        NOT NULL,
     updated_at  TIMESTAMP,
-    updated_who int references bp_user (user_id)
+    updated_who INT DEFAULT NULL,
+    FOREIGN KEY (updated_who) REFERENCES bp_user (user_id)
 );
 
 CREATE TABLE process_stage
@@ -35,7 +37,8 @@ CREATE TABLE process_stage
     created_at   TIMESTAMP   NOT NULL,
     created_who  VARCHAR(30) NOT NULL,
     updated_at   TIMESTAMP,
-    updated_who  int references bp_user (user_id),
+    updated_who  INT DEFAULT NULL,
+    FOREIGN KEY (updated_who) REFERENCES bp_user (user_id),
     process_id   INT REFERENCES business_process (process_id) ON DELETE CASCADE
 );
 
@@ -47,10 +50,8 @@ CREATE TABLE process_action
     created_at    TIMESTAMP   NOT NULL,
     created_who   VARCHAR(30) NOT NULL,
     updated_at    TIMESTAMP,
-    updated_who   int references bp_user (user_id),
+    updated_who   INT DEFAULT NULL,
+    FOREIGN KEY (updated_who) REFERENCES bp_user (user_id),
     stage_id      INT REFERENCES process_stage (stage_id) ON DELETE CASCADE,
     task_owner_id INT REFERENCES bp_user (user_id) ON DELETE RESTRICT
 );
-
-
-
