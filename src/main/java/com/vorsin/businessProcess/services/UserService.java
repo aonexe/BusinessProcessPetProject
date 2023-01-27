@@ -1,9 +1,9 @@
 package com.vorsin.businessProcess.services;
 
-import com.vorsin.businessProcess.dto.EmployeeUserRequest;
-import com.vorsin.businessProcess.dto.EmployeeViewResponse;
+import com.vorsin.businessProcess.dto.UserRequest;
+import com.vorsin.businessProcess.dto.UserViewResponse;
 import com.vorsin.businessProcess.models.User;
-import com.vorsin.businessProcess.models.UserRole;
+import com.vorsin.businessProcess.models.UserRoleEnum;
 import com.vorsin.businessProcess.repositories.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +12,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.beans.IntrospectionException;
+import java.beans.PropertyDescriptor;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -30,75 +34,83 @@ public class UserService {
         this.modelMapper = modelMapper;
     }
 
-    public List<EmployeeViewResponse> getUsers() {
-        return userRepository.findAll().stream().map(this::convertToEmployeeViewResponse).collect(Collectors.toList());
+    public List<UserViewResponse> getUsers() {
+        return userRepository.findAll().stream().map(this::convertToUserViewResponse).collect(Collectors.toList());
     }
 
     @Transactional
-    public void createUser(EmployeeUserRequest employeeUserRequest) {
-        if (isUserPresent(employeeUserRequest.getUsername())) {
+    public void createUser(UserRequest userRequest) {
+        if (userRepository.findByUsername(userRequest.getUsername()).isPresent()) {
             //todo custom status
             throw new ResponseStatusException(HttpStatus.CONFLICT);
         } else {
-            User newEmployee = convertToEmployee(employeeUserRequest);
-            enrichNewEmployee(newEmployee);
-            userRepository.save(newEmployee);
+            User newUser = modelMapper.map(userRequest, User.class);
+            initNewUser(newUser);
+            userRepository.save(newUser);
         }
     }
 
     @Transactional
-    public void updateUser(EmployeeUserRequest employeeUserRequest, String username) {
-        if (isUserPresent(username)) {
+    public void updateUser(UserRequest userRequest, int id) {
+        if (userRepository.findById(id).isPresent()) {
             //todo одинаковые юзернеймы или емэйлы
-            User employee = convertToEmployee(employeeUserRequest);
-            enrichEmployee(employee, username);
-            userRepository.save(employee);
+            User user = userRepository.findById(id).get();
+            initUser(user, userRequest);
+            userRepository.save(user);
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
     }
 
-
     @Transactional
-    public void deleteUser(String username) {
-        if (isUserPresent(username)) {
-            User employee = userRepository.findByUsername(username).get();
-            userRepository.deleteById(employee.getId());
+    public void deleteUser(int id) {
+        if (isUserPresent(id)) {
+            userRepository.deleteById(id);
         }
     }
 
-    private boolean isUserPresent(String username) {
-        Optional<User> employee = userRepository.findByUsername(username);
+    private boolean isUserPresent(int id) {
+        Optional<User> employee = userRepository.findById(id);
         return employee.isPresent();
     }
 
-    private EmployeeViewResponse convertToEmployeeViewResponse(User employee) {
-        return modelMapper.map(employee, EmployeeViewResponse.class);
-    }
-
-    private User convertToEmployee(EmployeeUserRequest employeeUserRequest) {
-        User employee = modelMapper.map(employeeUserRequest, User.class);
-        return employee;
+    private UserViewResponse convertToUserViewResponse(User user) {
+        return modelMapper.map(user, UserViewResponse.class);
     }
 
 
     //todo
-    private void enrichNewEmployee(User newEmployee) {
-        newEmployee.setCreatedAt(LocalDateTime.now());
+    private void initNewUser(User newUser) {
+        newUser.setCreatedAt(LocalDateTime.now());
         //todo
-        newEmployee.setCreatedWho("ROLE_ADMIN");
-        newEmployee.setUserRole(UserRole.USER);
+        newUser.setCreatedWho("ROLE_ADMIN");
+        newUser.setUserRole(UserRoleEnum.USER);
     }
 
-    private void enrichEmployee(User newEmployee, String username) {
-        User oldEmployee = userRepository.findByUsername(username).get();
-        newEmployee.setId(oldEmployee.getId());
-        newEmployee.setUserRole(oldEmployee.getUserRole());
-        newEmployee.setCreatedAt(oldEmployee.getCreatedAt());
-        newEmployee.setCreatedWho(oldEmployee.getCreatedWho());
-        //todo
-        newEmployee.setUpdatedAt(LocalDateTime.now());
-        newEmployee.setUpdatedWho(new User());
-    }
+    private void initUser(User user, UserRequest userRequest) {
 
+        Class<?> objClass = userRequest.getClass();
+        for (Field field : objClass.getDeclaredFields()) {
+            // Invoke the getter method on the UserRequest object.
+            Object objField;
+            try {
+                objField = new PropertyDescriptor(field.getName(),
+                        UserRequest.class).getReadMethod().invoke(userRequest);
+            } catch (IllegalAccessException | InvocationTargetException | IntrospectionException e) {
+                throw new RuntimeException(e);
+            }
+
+            // Invoke the setter method on the User object.
+            try {
+                new PropertyDescriptor(field.getName(), User.class)
+                        .getWriteMethod().invoke(user, objField);
+            } catch (IllegalAccessException | InvocationTargetException | IntrospectionException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        user.setUpdatedAt(LocalDateTime.now());
+        //todo current user from auth
+        user.setUpdatedWho(userRepository.findByUsername("aonexe").get());
+    }
 }

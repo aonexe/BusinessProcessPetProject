@@ -12,7 +12,7 @@ public class ProcessAction {
     private int id;
 
     @Column(name = "resolution")
-    private StageResult resolution;
+    private StageResultEnum resolution;
 
     @Column(name = "action_result")
     private boolean actionResult;
@@ -35,11 +35,11 @@ public class ProcessAction {
         this.id = id;
     }
 
-    public StageResult getResolution() {
+    public StageResultEnum getResolution() {
         return resolution;
     }
 
-    public void setResolution(StageResult resolution) {
+    public void setResolution(StageResultEnum resolution) {
         this.resolution = resolution;
     }
 

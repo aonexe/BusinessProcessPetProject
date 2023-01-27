@@ -8,9 +8,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 
-public class EmployeeViewResponse {
-
-    private int id;
+public class UserRequest {
 
     @NotEmpty(message = "First name should be not empty")
     @Size(min = 2, max = 30, message = "First name should be between 2 and 30 characters")
@@ -32,24 +30,19 @@ public class EmployeeViewResponse {
     @Size(min = 2, max = 30, message = "Username should be between 2 and 30 characters")
     private String username;
 
-    public EmployeeViewResponse() {
-    }
+    @NotEmpty(message = "Password should be not empty")
+    @Size(min = 8, max = 50, message = "Password should be between 8 and 50 characters")
+    private String password;
 
-    public EmployeeViewResponse(int id, String firstName, String lastName, Date dateOfBirth, String email, String username) {
-        this.id = id;
+    public UserRequest() {}
+
+    public UserRequest(String firstName, String lastName, Date dateOfBirth, String email, String username, String password) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.dateOfBirth = dateOfBirth;
         this.email = email;
         this.username = username;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
+        this.password = password;
     }
 
     public String getFirstName() {
@@ -90,5 +83,13 @@ public class EmployeeViewResponse {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

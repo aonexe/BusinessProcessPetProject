@@ -1,5 +1,5 @@
 package com.vorsin.businessProcess.models;
 
-public enum StageResult {
+public enum StageResultEnum {
     NOT_STARTED, IN_PROGRESS, APPROVE, REJECT,
 }

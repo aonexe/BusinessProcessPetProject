@@ -1,6 +1,5 @@
 package com.vorsin.businessProcess.controllers;
 
-import com.vorsin.businessProcess.dto.EmployeeUserRequest;
 import com.vorsin.businessProcess.dto.StageDTO;
 import com.vorsin.businessProcess.services.StageService;
 import jakarta.validation.Valid;
@@ -43,9 +42,9 @@ public class StageController {
     }
 
     @PatchMapping("/stage/{stageId}")
-    public ResponseEntity<HttpStatus> updateEmployee(@PathVariable("id") int id,
-                                                     @PathVariable("stageId") int stageId,
-                                                     @RequestBody @Valid StageDTO stageDTO) {
+    public ResponseEntity<HttpStatus> updateUser(@PathVariable("id") int id,
+                                                 @PathVariable("stageId") int stageId,
+                                                 @RequestBody @Valid StageDTO stageDTO) {
         stageService.updateStage(stageDTO, id, stageId);
         return ResponseEntity.ok(HttpStatus.OK);
     }
