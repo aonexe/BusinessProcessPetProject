@@ -7,7 +7,9 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface BusinessProcessRepository extends JpaRepository<BusinessProcess, Integer> {
+public interface BPRepository extends JpaRepository<BusinessProcess, Integer> {
 
     Optional<BusinessProcess> findByTitle(String title);
+
+
 }

@@ -1,17 +1,22 @@
 package com.vorsin.businessProcess.services;
 
-import com.vorsin.businessProcess.dto.StageDTO;
+import com.vorsin.businessProcess.dto.StageRequest;
+import com.vorsin.businessProcess.dto.StageResponse;
+import com.vorsin.businessProcess.dto.UserResponse;
 import com.vorsin.businessProcess.models.BusinessProcess;
 import com.vorsin.businessProcess.models.Stage;
 import com.vorsin.businessProcess.models.StageResultEnum;
-import com.vorsin.businessProcess.repositories.BusinessProcessRepository;
+import com.vorsin.businessProcess.repositories.BPRepository;
 import com.vorsin.businessProcess.repositories.StageRepository;
+import com.vorsin.businessProcess.repositories.UserRepository;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -19,70 +24,89 @@ import java.util.stream.Collectors;
 @Service
 public class StageService {
 
-    private final BusinessProcessRepository businessProcessRepository;
+
     private final StageRepository stageRepository;
+    private final UserRepository userRepository;
+    private final BPRepository bpRepository;
 
     private final ModelMapper modelMapper;
 
+
     @Autowired
-    public StageService(BusinessProcessRepository businessProcessRepository,
-                        StageRepository stageRepository, ModelMapper modelMapper) {
-        this.businessProcessRepository = businessProcessRepository;
+    public StageService(StageRepository stageRepository, UserRepository userRepository, BPRepository bpRepository, ModelMapper modelMapper) {
         this.stageRepository = stageRepository;
+        this.userRepository = userRepository;
+        this.bpRepository = bpRepository;
         this.modelMapper = modelMapper;
     }
 
-    public List<StageDTO> getStages(int businessProcessId) {
-        var allStages = stageRepository.findAllByBusinessProcess_Id(businessProcessId);
-
-        return allStages.stream().map(this::convertToStageDTO)
+    public List<StageResponse> getStages() {
+        return stageRepository.findAll().stream().map(this::convertToStageResponse)
                 .collect(Collectors.toList());
     }
 
-    public void createStage(int businessProcessId, StageDTO stageDTO) {
-        Stage stage = convertToStage(stageDTO);
-        enrichNewStage(businessProcessId, stage);
+    public void createStage(StageRequest stageRequest) {
+        Stage stage = modelMapper.map(stageRequest, Stage.class);
+        initNewStage(stage, stageRequest);
         stageRepository.save(stage);
     }
 
-    public void updateStage(StageDTO stageDTO, int businessProcessId, int stageId) {
-
-        //todo пресент в отдельный метод
-        Optional<Stage> stage = stageRepository.findByBusinessProcess_IdAndId(businessProcessId, stageId);
+    public void updateStage(int id, StageRequest stageRequest) {
+        Optional<Stage> stage = stageRepository.findById(id);
         if (stage.isPresent()) {
-            //todo смена тайтла и апдейт в отдельный метод
-            stage.get().setTitle(stageDTO.getTitle());
+            initStage(stage.get(), stageRequest);
             stageRepository.save(stage.get());
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
     }
 
-
-    public void deleteStage(int businessProcessId, int stageId) {
-        //todo пресент в отдельный метод
-        Optional<Stage> stage = stageRepository.findByBusinessProcess_IdAndId(businessProcessId, stageId);
-        if (stage.isPresent()){
-            stageRepository.delete(stage.get());
+    public void deleteStage(int id) {
+        if (stageRepository.findById(id).isPresent()) {
+            stageRepository.deleteById(id);
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
     }
 
-    private  StageDTO convertToStageDTO(Stage stage) {
-        return modelMapper.map(stage, StageDTO.class);
-    }
-    private Stage convertToStage(StageDTO stageDTO) {
-        return modelMapper.map(stageDTO, Stage.class);
+    private StageResponse convertToStageResponse(Stage stage) {
+
+        return modelMapper.map(stage, StageResponse.class);
     }
 
-    private void enrichNewStage(int businessProcessId, Stage stage) {
-        Optional<BusinessProcess> businessProcess = businessProcessRepository.findById(businessProcessId);
-        if (businessProcess.isPresent()) {
-            stage.setStageResult(StageResultEnum.NOT_STARTED);
-            stage.setBusinessProcess(businessProcess.get());
-        } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        }
+
+    private void initNewStage(Stage stage, StageRequest stageRequest) {
+
+        BusinessProcess businessProcess = checkIfBusinessProcessExists(stageRequest);
+        stage.setBusinessProcess(businessProcess);
+
+        stage.setCreatedAt(LocalDateTime.now());
+        //todo current user from auth
+        stage.setCreatedWho(userRepository.findById(2).get());
+        stage.setStageResult(StageResultEnum.NOT_STARTED);
     }
+
+    private void initStage(Stage stage, StageRequest stageRequest) {
+
+        BusinessProcess businessProcess = checkIfBusinessProcessExists(stageRequest);
+        stage.setBusinessProcess(businessProcess);
+
+        stage.setTitle(stageRequest.getTitle());
+
+        stage.setUpdatedAt(LocalDateTime.now());
+        //todo current user from auth
+        stage.setUpdatedWho(userRepository.findById(2).get());
+
+    }
+
+    private BusinessProcess checkIfBusinessProcessExists(StageRequest stageRequest) {
+        Optional<BusinessProcess> businessProcess = bpRepository.findById(stageRequest.getBusinessProcessId());
+        if (businessProcess.isEmpty()) {
+            //todo
+            throw new RuntimeException("bp not found");
+        }
+        return businessProcess.get();
+    }
+
 }
+
