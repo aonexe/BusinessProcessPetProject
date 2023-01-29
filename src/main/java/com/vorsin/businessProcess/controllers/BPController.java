@@ -1,7 +1,8 @@
 package com.vorsin.businessProcess.controllers;
 
-import com.vorsin.businessProcess.dto.BusinessProcessDTO;
-import com.vorsin.businessProcess.services.BusinessProcessService;
+import com.vorsin.businessProcess.dto.BPResponse;
+import com.vorsin.businessProcess.dto.BPRequest;
+import com.vorsin.businessProcess.services.BPService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,46 +21,42 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/bp")
-public class BusinessProcessController {
+public class BPController {
 
-    private final BusinessProcessService businessProcessService;
+    private final BPService bpService;
 
     @Autowired
-    public BusinessProcessController(BusinessProcessService businessProcessService) {
-        this.businessProcessService = businessProcessService;
+    public BPController(BPService bpService) {
+        this.bpService = bpService;
     }
 
     @GetMapping
-    public List<BusinessProcessDTO> getBusinessProcess() {
-        return businessProcessService.getBusinessProcess();
+    public List<BPResponse> getBusinessProcesses() {
+        return bpService.getBusinessProcesses();
     }
 
     @PostMapping("/new")
-    public ResponseEntity<HttpStatus> createBusinessProcess(@RequestBody @Valid BusinessProcessDTO businessProcessDTO,
+    public ResponseEntity<HttpStatus> createBusinessProcess(@RequestBody @Valid BPRequest bpRequest,
                                                             BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             //todo throw response
             System.out.println("error create bp!!");
         }
-        businessProcessService.createBusinessProcess(businessProcessDTO);
-        return ResponseEntity.ok(HttpStatus.OK);
+        bpService.createBusinessProcess(bpRequest);
+        return ResponseEntity.ok(HttpStatus.CREATED);
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<HttpStatus> updateBusinessProcess(@RequestBody @Valid BusinessProcessDTO businessProcessDTO,
-                                                            @PathVariable("id") int id) {
-        businessProcessService.updateBusinessProcess(businessProcessDTO, id);
+    public ResponseEntity<HttpStatus> updateBusinessProcess( @PathVariable("id") int id,
+                                                             @RequestBody @Valid BPRequest bpRequest) {
+        bpService.updateBusinessProcess(bpRequest, id);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<HttpStatus> deleteBusinessProcess(@PathVariable("id") int id) {
-        businessProcessService.deleteBusinessProcess(id);
+        bpService.deleteBusinessProcess(id);
         return ResponseEntity.ok(HttpStatus.OK);
     }
-
-
-
-
 
 }

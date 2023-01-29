@@ -12,9 +12,7 @@ public class BusinessProcessApplication {
 		SpringApplication.run(BusinessProcessApplication.class, args);
 	}
 
-	@Bean
-	public ModelMapper modelMapper() {
-		return new ModelMapper();
-	}
+
+
 
 }

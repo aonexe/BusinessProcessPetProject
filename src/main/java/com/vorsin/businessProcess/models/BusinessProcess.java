@@ -1,5 +1,6 @@
 package com.vorsin.businessProcess.models;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -11,6 +12,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 import java.time.LocalDateTime;
@@ -26,27 +28,29 @@ public class BusinessProcess {
     private  int id;
 
     @Column(name = "title")
-    @NotEmpty
+    @NotNull
     @Size(max = 30, message = "Title should be less than 30 characters")
     private String title;
 
     @Column(name = "created_at")
+    @NotNull(message = "Created at time should not be empty")
     private LocalDateTime createdAt;
 
-    @Column(name = "created_who")
-    @NotEmpty
-    @Size(max = 30, message = "Creator name should be less than 30 characters")
-    private String createdWho;
+    @JoinColumn(name = "created_who", referencedColumnName = "user_id")
+    @OneToOne(fetch = FetchType.EAGER)
+    @NotNull(message = "Creator should not be empty")
+    private User createdWho;
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @Size(max = 30, message = "Updater name should be less than 30 characters")
-    @OneToOne(fetch = FetchType.LAZY)
+
     @JoinColumn(name = "updated_who", referencedColumnName = "user_id")
+    @OneToOne(fetch = FetchType.LAZY)
     private User updatedWho;
 
-    @OneToMany(mappedBy = "businessProcess")
+    @OneToMany(mappedBy = "businessProcess", fetch = FetchType.LAZY)
+    @JsonManagedReference
     private List<Stage> stages;
 
     public BusinessProcess() {}
@@ -80,11 +84,11 @@ public class BusinessProcess {
         this.createdAt = createdAt;
     }
 
-    public String getCreatedWho() {
+    public User getCreatedWho() {
         return createdWho;
     }
 
-    public void setCreatedWho(String createdWho) {
+    public void setCreatedWho(User createdWho) {
         this.createdWho = createdWho;
     }
 

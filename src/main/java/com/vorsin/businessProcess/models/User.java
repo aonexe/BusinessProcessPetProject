@@ -1,11 +1,10 @@
 package com.vorsin.businessProcess.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -13,10 +12,9 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Size;
-import org.hibernate.annotations.Type;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
@@ -32,12 +30,12 @@ public class User {
     private int id;
 
     @Column(name = "first_name")
-    @NotEmpty(message = "First name should be not empty")
+    @NotNull(message = "First name should be not empty")
     @Size(min = 2, max = 30, message = "First name should be between 2 and 30 characters")
     private String firstName;
 
     @Column(name = "last_name")
-    @NotEmpty(message = "Last name should be not empty")
+    @NotNull(message = "Last name should be not empty")
     @Size(min = 2, max = 30, message = "Last name should be between 2 and 30 characters")
     private String lastName;
 
@@ -47,17 +45,17 @@ public class User {
     private Date dateOfBirth;
 
     @Column(name = "email")
-    @NotEmpty(message = "Email should be not empty")
+    @NotNull(message = "Email should be not empty")
     @Email
     private String email;
 
     @Column(name = "username")
-    @NotEmpty(message = "Username should be not empty")
+    @NotNull(message = "Username should be not empty")
     @Size(min = 2, max = 30, message = "Username should be between 2 and 30 characters")
     private String username;
 
     @Column(name = "password")
-    @NotEmpty(message = "Password should be not empty")
+    @NotNull(message = "Password should be not empty")
     @Size(min = 8, max = 50, message = "Password should be between 8 and 50 characters")
     private String password;
 
@@ -66,17 +64,21 @@ public class User {
     private UserRoleEnum userRole;
 
     @Column(name = "created_at")
+    @NotNull(message = "Created at time should not be empty")
     private LocalDateTime createdAt;
 
-    @Column(name = "created_who")
-    @NotEmpty
-    private String createdWho;
+    @JoinColumn(name = "created_who", referencedColumnName = "user_id")
+    @OneToOne
+    @JsonBackReference
+    @NotNull(message = "Creator should not be empty")
+    private User createdWho;
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
     @JoinColumn(name = "updated_who", referencedColumnName = "user_id")
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne
+    @JsonBackReference
     private User updatedWho;
 
     //todo one to many
@@ -167,11 +169,11 @@ public class User {
         this.createdAt = createdAt;
     }
 
-    public String getCreatedWho() {
+    public User getCreatedWho() {
         return createdWho;
     }
 
-    public void setCreatedWho(String createdWho) {
+    public void setCreatedWho(User createdWho) {
         this.createdWho = createdWho;
     }
 

@@ -1,7 +1,7 @@
 package com.vorsin.businessProcess.controllers;
 
 import com.vorsin.businessProcess.dto.UserRequest;
-import com.vorsin.businessProcess.dto.UserViewResponse;
+import com.vorsin.businessProcess.dto.UserResponse;
 import com.vorsin.businessProcess.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +32,7 @@ public class UserController {
     }
 
     @GetMapping
-    public List<UserViewResponse> getUsers() {
+    public List<UserResponse> getUsers() {
         return userService.getUsers();
     }
 
@@ -40,13 +40,12 @@ public class UserController {
     public ResponseEntity<HttpStatus> createUser(@RequestBody @Valid UserRequest userRequest,
                                                      BindingResult bindingResult) {
 
-        //todo перенести логику в сервис
         if (bindingResult.hasErrors()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
 
         userService.createUser(userRequest);
-        return ResponseEntity.ok(HttpStatus.OK);
+        return ResponseEntity.ok(HttpStatus.CREATED);
     }
 
     @PatchMapping("/{id}")

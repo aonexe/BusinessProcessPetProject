@@ -1,6 +1,7 @@
 package com.vorsin.businessProcess.controllers;
 
-import com.vorsin.businessProcess.dto.StageDTO;
+import com.vorsin.businessProcess.dto.StageRequest;
+import com.vorsin.businessProcess.dto.StageResponse;
 import com.vorsin.businessProcess.services.StageService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/bp/{id}")
+@RequestMapping("/stages")
 public class StageController {
 
     private final StageService stageService;
@@ -29,30 +30,28 @@ public class StageController {
     }
 
     @GetMapping()
-    public List<StageDTO> getStages(@PathVariable int id) {
-        return stageService.getStages(id);
+    public List<StageResponse> getStages() {
+        return stageService.getStages();
     }
 
     @PostMapping("/new")
-    public ResponseEntity<HttpStatus> createStage(@PathVariable int id,
-                                                  @RequestBody @Valid StageDTO stageDTO) {
+    public ResponseEntity<HttpStatus> createStage(@RequestBody @Valid StageRequest stageRequest) {
 
-        stageService.createStage(id, stageDTO);
+        //todo binding result
+        stageService.createStage(stageRequest);
+        return ResponseEntity.ok(HttpStatus.CREATED);
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<HttpStatus> updateStage(@PathVariable("id") int id,
+                                                  @RequestBody @Valid StageRequest stageRequest) {
+        stageService.updateStage(id, stageRequest);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
-    @PatchMapping("/stage/{stageId}")
-    public ResponseEntity<HttpStatus> updateUser(@PathVariable("id") int id,
-                                                 @PathVariable("stageId") int stageId,
-                                                 @RequestBody @Valid StageDTO stageDTO) {
-        stageService.updateStage(stageDTO, id, stageId);
-        return ResponseEntity.ok(HttpStatus.OK);
-    }
-
-    @DeleteMapping("/stage/{stageId}")
-    public ResponseEntity<HttpStatus> deleteStage(@PathVariable("id") int id,
-                                                  @PathVariable("stageId") int stageId) {
-        stageService.deleteStage(id, stageId);
+    @DeleteMapping("/{id}")
+    public ResponseEntity<HttpStatus> deleteStage(@PathVariable("id") int id) {
+        stageService.deleteStage(id);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 }

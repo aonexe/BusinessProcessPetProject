@@ -2,12 +2,8 @@ package com.vorsin.businessProcess.dto;
 
 import com.vorsin.businessProcess.models.User;
 import com.vorsin.businessProcess.models.UserRoleEnum;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.OneToOne;
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Size;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -15,15 +11,15 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDateTime;
 import java.util.Date;
 
-public class UserViewResponse {
+public class UserResponse {
 
     private int id;
 
-    @NotEmpty(message = "First name should be not empty")
+    @NotNull(message = "First name should be not empty")
     @Size(min = 2, max = 30, message = "First name should be between 2 and 30 characters")
     private String firstName;
 
-    @NotEmpty(message = "Last name should be not empty")
+    @NotNull(message = "Last name should be not empty")
     @Size(min = 2, max = 30, message = "Last name should be between 2 and 30 characters")
     private String lastName;
 
@@ -31,38 +27,27 @@ public class UserViewResponse {
     @DateTimeFormat(pattern = "dd/MM/yyyy")
     private Date dateOfBirth;
 
-    @NotEmpty(message = "Email should be not empty")
+    @NotNull(message = "Email should be not empty")
     @Email
     private String email;
 
-    @NotEmpty(message = "Username should be not empty")
+    @NotNull(message = "Username should be not empty")
     @Size(min = 2, max = 30, message = "Username should be between 2 and 30 characters")
     private String username;
 
-
-    @Enumerated(EnumType.STRING)
     private UserRoleEnum userRole;
 
+    @NotNull(message = "Created at time should not be empty")
     private LocalDateTime createdAt;
 
-    @NotEmpty
-    private String createdWho;
+    @NotNull(message = "Creator should not be empty")
+    private User createdWho;
 
     private LocalDateTime updatedAt;
 
-    @OneToOne(fetch = FetchType.LAZY)
     private User updatedWho;
 
-    public UserViewResponse() {
-    }
-
-    public UserViewResponse(int id, String firstName, String lastName, Date dateOfBirth, String email, String username) {
-        this.id = id;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.dateOfBirth = dateOfBirth;
-        this.email = email;
-        this.username = username;
+    public UserResponse() {
     }
 
     public int getId() {
@@ -129,11 +114,11 @@ public class UserViewResponse {
         this.createdAt = createdAt;
     }
 
-    public String getCreatedWho() {
+    public User getCreatedWho() {
         return createdWho;
     }
 
-    public void setCreatedWho(String createdWho) {
+    public void setCreatedWho(User createdWho) {
         this.createdWho = createdWho;
     }
 
