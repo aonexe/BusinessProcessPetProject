@@ -2,7 +2,6 @@ package com.vorsin.businessProcess.services;
 
 import com.vorsin.businessProcess.dto.StageRequest;
 import com.vorsin.businessProcess.dto.StageResponse;
-import com.vorsin.businessProcess.dto.UserResponse;
 import com.vorsin.businessProcess.models.BusinessProcess;
 import com.vorsin.businessProcess.models.Stage;
 import com.vorsin.businessProcess.models.StageResultEnum;
@@ -10,7 +9,6 @@ import com.vorsin.businessProcess.repositories.BPRepository;
 import com.vorsin.businessProcess.repositories.StageRepository;
 import com.vorsin.businessProcess.repositories.UserRepository;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.TypeMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -62,7 +60,7 @@ public class StageService {
     }
 
     public void deleteStage(int id) {
-        if (stageRepository.findById(id).isPresent()) {
+        if (stageRepository.existsById(id)) {
             stageRepository.deleteById(id);
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);

@@ -2,6 +2,7 @@ package com.vorsin.businessProcess.models;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -17,12 +18,14 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.Data;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
 @Table(name = "process_stage")
+@Data
 public class Stage {
 
     @Id
@@ -42,18 +45,22 @@ public class Stage {
 
     @Column(name = "created_at")
     @NotNull(message = "Created at time should not be empty")
+    @JsonIgnore
     private LocalDateTime createdAt;
 
     @JoinColumn(name = "created_who", referencedColumnName = "user_id")
     @OneToOne(fetch = FetchType.EAGER)
     @NotNull(message = "Creator should not be empty")
+    @JsonIgnore
     private User createdWho;
 
     @Column(name = "updated_at")
+    @JsonIgnore
     private LocalDateTime updatedAt;
 
     @JoinColumn(name = "updated_who", referencedColumnName = "user_id")
     @OneToOne(fetch = FetchType.EAGER)
+    @JsonIgnore
     private User updatedWho;
 
     @JoinColumn(name = "process_id", referencedColumnName = "process_id")
@@ -62,88 +69,10 @@ public class Stage {
     @JsonBackReference
     private BusinessProcess businessProcess;
 
-    @OneToMany(mappedBy = "stage")
-    @JsonIgnore
-    private List<ProcessAction> actions;
+    @OneToMany(mappedBy = "stage", fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private List<Action> actions;
 
-
-    public Stage() {}
-
-    public Stage(String title) {
-        this.title = title;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public StageResultEnum getStageResult() {
-        return stageResult;
-    }
-
-    public void setStageResult(StageResultEnum stageResult) {
-        this.stageResult = stageResult;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public User getCreatedWho() {
-        return createdWho;
-    }
-
-    public void setCreatedWho(User createdWho) {
-        this.createdWho = createdWho;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public User getUpdatedWho() {
-        return updatedWho;
-    }
-
-    public void setUpdatedWho(User updatedWho) {
-        this.updatedWho = updatedWho;
-    }
-
-    public BusinessProcess getBusinessProcess() {
-        return businessProcess;
-    }
-
-    public void setBusinessProcess(BusinessProcess businessProcess) {
-        this.businessProcess = businessProcess;
-    }
-
-    public List<ProcessAction> getActions() {
-        return actions;
-    }
-
-    public void setActions(List<ProcessAction> actions) {
-        this.actions = actions;
-    }
 }
 
 
