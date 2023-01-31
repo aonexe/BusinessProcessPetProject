@@ -1,19 +1,20 @@
 # BusinessProcessPetProject
-Business process pet project
 
-# Users api
+## Users api
 A RESTful API for managing useres.
 
-## Endpoints
+### Endpoints
 
-### Get all users
+#### Get all users
 
 `GET /users`
 
 Retrieves a list of all users.
 
-#### Response
+##### Response
 
+
+```json
 [
     {
         "id": 1,
