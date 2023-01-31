@@ -35,7 +35,7 @@ public class BPController {
         return bpService.getBusinessProcesses();
     }
 
-    @PostMapping("/new")
+    @PostMapping()
     public ResponseEntity<HttpStatus> createBusinessProcess(@RequestBody @Valid BPRequest bpRequest,
                                                             BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {

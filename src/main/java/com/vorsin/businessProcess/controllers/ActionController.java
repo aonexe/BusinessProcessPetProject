@@ -34,7 +34,7 @@ public class ActionController {
         return actionService.getActions();
     }
 
-    @PostMapping("/new")
+    @PostMapping()
     public ResponseEntity<HttpStatus> createAction(@RequestBody @Valid ActionRequest actionRequest) {
 
         //todo binding result

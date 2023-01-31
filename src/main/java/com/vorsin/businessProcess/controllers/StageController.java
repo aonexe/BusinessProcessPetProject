@@ -34,7 +34,7 @@ public class StageController {
         return stageService.getStages();
     }
 
-    @PostMapping("/new")
+    @PostMapping()
     public ResponseEntity<HttpStatus> createStage(@RequestBody @Valid StageRequest stageRequest) {
 
         //todo binding result
