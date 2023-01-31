@@ -11,5 +11,8 @@ public interface BPRepository extends JpaRepository<BusinessProcess, Integer> {
 
     Optional<BusinessProcess> findByTitle(String title);
 
+    boolean existsByTitle(String title);
+
+
 
 }
