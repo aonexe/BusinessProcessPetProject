@@ -1,6 +1,5 @@
 package com.vorsin.businessProcess.services;
 
-
 import com.vorsin.businessProcess.dto.BPRequest;
 import com.vorsin.businessProcess.dto.BPResponse;
 import com.vorsin.businessProcess.models.BusinessProcess;
@@ -22,7 +21,6 @@ public class BPService {
 
     private final BPRepository bpRepository;
     private final UserRepository userRepository;
-
     private final ModelMapper modelMapper;
 
     @Autowired
@@ -50,7 +48,7 @@ public class BPService {
     }
 
     @Transactional
-    public void updateBusinessProcess(BPRequest bpRequest, int id) {
+    public void updateBusinessProcess(int id, BPRequest bpRequest ) {
         if (bpRepository.existsById(id)) {
             //todo custom exception
             if (bpRepository.existsByTitle(bpRequest.getTitle())){
@@ -87,7 +85,6 @@ public class BPService {
 
     private void initBusinessProcess(BusinessProcess businessProcess, BPRequest bpRequest) {
 
-        //todo check if this title in db
         businessProcess.setTitle(bpRequest.getTitle());
 
         //todo

@@ -47,9 +47,9 @@ public class BPController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<HttpStatus> updateBusinessProcess( @PathVariable("id") int id,
-                                                             @RequestBody @Valid BPRequest bpRequest) {
-        bpService.updateBusinessProcess(bpRequest, id);
+    public ResponseEntity<HttpStatus> updateBusinessProcess(@PathVariable("id") int id,
+                                                            @RequestBody @Valid BPRequest bpRequest) {
+        bpService.updateBusinessProcess(id, bpRequest);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 

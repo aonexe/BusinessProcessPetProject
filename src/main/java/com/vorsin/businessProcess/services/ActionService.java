@@ -6,7 +6,6 @@ import com.vorsin.businessProcess.models.Action;
 import com.vorsin.businessProcess.models.Stage;
 import com.vorsin.businessProcess.models.User;
 import com.vorsin.businessProcess.repositories.ActionRepository;
-import com.vorsin.businessProcess.repositories.BPRepository;
 import com.vorsin.businessProcess.repositories.StageRepository;
 import com.vorsin.businessProcess.repositories.UserRepository;
 import org.modelmapper.ModelMapper;
@@ -25,17 +24,13 @@ public class ActionService {
 
     private final StageRepository stageRepository;
     private final UserRepository userRepository;
-    private final BPRepository bpRepository;
-
     private final ActionRepository actionRepository;
     private final ModelMapper modelMapper;
 
-
     @Autowired
-    public ActionService(StageRepository stageRepository, UserRepository userRepository, BPRepository bpRepository, ActionRepository actionRepository, ModelMapper modelMapper) {
+    public ActionService(StageRepository stageRepository, UserRepository userRepository, ActionRepository actionRepository, ModelMapper modelMapper) {
         this.stageRepository = stageRepository;
         this.userRepository = userRepository;
-        this.bpRepository = bpRepository;
         this.actionRepository = actionRepository;
         this.modelMapper = modelMapper;
     }
@@ -73,28 +68,23 @@ public class ActionService {
         return modelMapper.map(action, ActionResponse.class);
     }
 
-
     private void initNewAction(Action action, ActionRequest actionRequest) {
 
-        Stage stage = checkIfStageExists(actionRequest);
-        action.setStage(stage);
-
-        User taskOwner = checkIfUserExists(actionRequest);
-        action.setTaskOwner(taskOwner);
+        action.setStage(getStageIfExists(actionRequest.getStageId()));
+        action.setTaskOwner(getUserIfExists(actionRequest.getTaskOwnerId()));
 
         action.setCreatedAt(LocalDateTime.now());
         //todo current user from auth
         action.setCreatedWho(userRepository.findById(2).get());
+
         action.setActionResult(null);
     }
 
     private void initAction(Action action, ActionRequest actionRequest) {
 
-        Stage stage = checkIfStageExists(actionRequest);
-        action.setStage(stage);
+        action.setStage(getStageIfExists(actionRequest.getStageId()));
 
-        User taskOwner = checkIfUserExists(actionRequest);
-        action.setTaskOwner(taskOwner);
+        action.setTaskOwner(getUserIfExists(actionRequest.getTaskOwnerId()));
 
         action.setUpdatedAt(LocalDateTime.now());
         //todo current user from auth
@@ -102,8 +92,8 @@ public class ActionService {
 
     }
 
-    private Stage checkIfStageExists(ActionRequest actionRequest) {
-        Optional<Stage> stage = stageRepository.findById(actionRequest.getStageId());
+    private Stage getStageIfExists(int stageId) {
+        Optional<Stage> stage = stageRepository.findById(stageId);
         if (stage.isEmpty()) {
             //todo
             throw new RuntimeException("stage not found");
@@ -111,14 +101,13 @@ public class ActionService {
         return stage.get();
     }
 
-    private User checkIfUserExists(ActionRequest actionRequest) {
-        Optional<User> user = userRepository.findById(actionRequest.getTaskOwnerId());
+    private User getUserIfExists(int userId) {
+        Optional<User> user = userRepository.findById(userId);
         if (user.isEmpty()) {
             //todo
             throw new RuntimeException("user not found");
         }
         return user.get();
     }
-
 }
 

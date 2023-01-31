@@ -22,11 +22,9 @@ import java.util.stream.Collectors;
 @Service
 public class StageService {
 
-
     private final StageRepository stageRepository;
     private final UserRepository userRepository;
     private final BPRepository bpRepository;
-
     private final ModelMapper modelMapper;
 
 
@@ -75,8 +73,7 @@ public class StageService {
 
     private void initNewStage(Stage stage, StageRequest stageRequest) {
 
-        BusinessProcess businessProcess = checkIfBusinessProcessExists(stageRequest);
-        stage.setBusinessProcess(businessProcess);
+        stage.setBusinessProcess(getBusinessProcessIfExists(stageRequest.getBusinessProcessId()));
 
         stage.setCreatedAt(LocalDateTime.now());
         //todo current user from auth
@@ -86,8 +83,7 @@ public class StageService {
 
     private void initStage(Stage stage, StageRequest stageRequest) {
 
-        BusinessProcess businessProcess = checkIfBusinessProcessExists(stageRequest);
-        stage.setBusinessProcess(businessProcess);
+        stage.setBusinessProcess(getBusinessProcessIfExists(stageRequest.getBusinessProcessId()));
 
         stage.setTitle(stageRequest.getTitle());
 
@@ -97,8 +93,8 @@ public class StageService {
 
     }
 
-    private BusinessProcess checkIfBusinessProcessExists(StageRequest stageRequest) {
-        Optional<BusinessProcess> businessProcess = bpRepository.findById(stageRequest.getBusinessProcessId());
+    private BusinessProcess getBusinessProcessIfExists(int businessProcessId) {
+        Optional<BusinessProcess> businessProcess = bpRepository.findById(businessProcessId);
         if (businessProcess.isEmpty()) {
             //todo
             throw new RuntimeException("bp not found");
