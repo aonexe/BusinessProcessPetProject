@@ -5,14 +5,13 @@ A RESTful API for managing users.
 
 ### Endpoints
 
-#### Get all users
+#### 1. Get all users
 
 `GET /users`
 
 Retrieves a list of all users.
 
 ##### Response
-
 
 ```json
 [
@@ -35,10 +34,23 @@ Retrieves a list of all users.
         "userRole": "USER"
     }
 ]
-```json
+```
 
-#### Create new user
+#### 2. Create new user
 
 `POST /users/new`
 
 Retrieves a list of all users.
+
+##### Request
+
+```json
+{
+    "firstName":"Fname 1",
+    "lastName":"Lname 1",
+    "dateOfBirth":"1998-01-16",
+    "email":"user1@gmail.com",
+    "username":"user1",
+    "password":"1asd2345asd6789"
+}
+```
