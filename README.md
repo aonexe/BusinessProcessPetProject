@@ -1,7 +1,7 @@
 # BusinessProcessPetProject
 
 ## Users api
-A RESTful API for managing useres.
+A RESTful API for managing users.
 
 ### Endpoints
 
@@ -35,3 +35,10 @@ Retrieves a list of all users.
         "userRole": "USER"
     }
 ]
+```json
+
+#### Create new user
+
+`POST /users/new`
+
+Retrieves a list of all users.
