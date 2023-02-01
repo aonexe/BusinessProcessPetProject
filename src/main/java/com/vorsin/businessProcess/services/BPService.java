@@ -1,12 +1,10 @@
 package com.vorsin.businessProcess.services;
 
-
 import com.vorsin.businessProcess.dto.BPRequest;
 import com.vorsin.businessProcess.dto.BPResponse;
 import com.vorsin.businessProcess.models.BusinessProcess;
 import com.vorsin.businessProcess.repositories.BPRepository;
 import com.vorsin.businessProcess.repositories.UserRepository;
-import org.hibernate.Hibernate;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,7 +14,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -24,7 +21,6 @@ public class BPService {
 
     private final BPRepository bpRepository;
     private final UserRepository userRepository;
-
     private final ModelMapper modelMapper;
 
     @Autowired
@@ -41,7 +37,12 @@ public class BPService {
 
     @Transactional
     public void createBusinessProcess(BPRequest bpRequest) {
-        if (bpRepository.findByTitle(bpRequest.getTitle()).isPresent()) {
+        if (bpRequest.getTitle().equals("")) {
+
+            //todo
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY);
+        }
+        if (bpRepository.existsByTitle(bpRequest.getTitle())) {
             //todo custom exception
             throw new ResponseStatusException(HttpStatus.CONFLICT);
         } else {
@@ -52,10 +53,10 @@ public class BPService {
     }
 
     @Transactional
-    public void updateBusinessProcess(BPRequest bpRequest, int id) {
-        if (bpRepository.findById(id).isPresent()) {
+    public void updateBusinessProcess(int id, BPRequest bpRequest) {
+        if (bpRepository.existsById(id)) {
             //todo custom exception
-            if (bpRepository.findByTitle(bpRequest.getTitle()).isPresent()){
+            if (bpRepository.existsByTitle(bpRequest.getTitle())) {
                 throw new ResponseStatusException(HttpStatus.CONFLICT);
             }
             BusinessProcess businessProcess = bpRepository.findById(id).get();
@@ -68,7 +69,7 @@ public class BPService {
 
     @Transactional
     public void deleteBusinessProcess(int id) {
-        if (bpRepository.findById(id).isPresent()) {
+        if (bpRepository.existsById(id)) {
             bpRepository.deleteById(id);
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);

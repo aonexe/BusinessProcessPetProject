@@ -30,12 +30,12 @@ public class UserService {
     }
 
     public List<UserResponse> getUsers() {
-        return userRepository.findAll().stream().map(this::convertToUserViewResponse).collect(Collectors.toList());
+        return userRepository.findAll().stream().map(this::convertToUserResponse).collect(Collectors.toList());
     }
 
     @Transactional
     public void createUser(UserRequest userRequest) {
-        if (userRepository.findByUsernameOrEmail(userRequest.getUsername(), userRequest.getEmail()).isPresent()) {
+        if (userRepository.existsByUsernameOrEmail(userRequest.getUsername(), userRequest.getEmail())) {
             //todo custom status
             throw new ResponseStatusException(HttpStatus.CONFLICT);
         } else {
@@ -47,8 +47,8 @@ public class UserService {
 
     @Transactional
     public void updateUser(UserRequest userRequest, int id) {
-        if (userRepository.findById(id).isPresent()) {
-            if (userRepository.findByUsernameOrEmail(userRequest.getUsername(), userRequest.getEmail()).isPresent()){
+        if (userRepository.existsById(id)) {
+            if (userRepository.existsByUsernameOrEmail(userRequest.getUsername(), userRequest.getEmail())){
                 throw new ResponseStatusException(HttpStatus.CONFLICT);
             }
             User user = userRepository.findById(id).get();
@@ -61,14 +61,14 @@ public class UserService {
 
     @Transactional
     public void deleteUser(int id) {
-        if (userRepository.findById(id).isPresent()) {
+        if (userRepository.existsById(id)) {
             userRepository.deleteById(id);
         }  else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
     }
 
-    private UserResponse convertToUserViewResponse(User user) {
+    private UserResponse convertToUserResponse(User user) {
         return modelMapper.map(user, UserResponse.class);
     }
 

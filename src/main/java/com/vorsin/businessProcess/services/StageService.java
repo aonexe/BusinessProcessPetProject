@@ -2,7 +2,6 @@ package com.vorsin.businessProcess.services;
 
 import com.vorsin.businessProcess.dto.StageRequest;
 import com.vorsin.businessProcess.dto.StageResponse;
-import com.vorsin.businessProcess.dto.UserResponse;
 import com.vorsin.businessProcess.models.BusinessProcess;
 import com.vorsin.businessProcess.models.Stage;
 import com.vorsin.businessProcess.models.StageResultEnum;
@@ -10,7 +9,6 @@ import com.vorsin.businessProcess.repositories.BPRepository;
 import com.vorsin.businessProcess.repositories.StageRepository;
 import com.vorsin.businessProcess.repositories.UserRepository;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.TypeMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -24,11 +22,9 @@ import java.util.stream.Collectors;
 @Service
 public class StageService {
 
-
     private final StageRepository stageRepository;
     private final UserRepository userRepository;
     private final BPRepository bpRepository;
-
     private final ModelMapper modelMapper;
 
 
@@ -62,7 +58,7 @@ public class StageService {
     }
 
     public void deleteStage(int id) {
-        if (stageRepository.findById(id).isPresent()) {
+        if (stageRepository.existsById(id)) {
             stageRepository.deleteById(id);
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
@@ -77,8 +73,7 @@ public class StageService {
 
     private void initNewStage(Stage stage, StageRequest stageRequest) {
 
-        BusinessProcess businessProcess = checkIfBusinessProcessExists(stageRequest);
-        stage.setBusinessProcess(businessProcess);
+        stage.setBusinessProcess(getBusinessProcessIfExists(stageRequest.getBusinessProcessId()));
 
         stage.setCreatedAt(LocalDateTime.now());
         //todo current user from auth
@@ -88,8 +83,7 @@ public class StageService {
 
     private void initStage(Stage stage, StageRequest stageRequest) {
 
-        BusinessProcess businessProcess = checkIfBusinessProcessExists(stageRequest);
-        stage.setBusinessProcess(businessProcess);
+        stage.setBusinessProcess(getBusinessProcessIfExists(stageRequest.getBusinessProcessId()));
 
         stage.setTitle(stageRequest.getTitle());
 
@@ -99,8 +93,8 @@ public class StageService {
 
     }
 
-    private BusinessProcess checkIfBusinessProcessExists(StageRequest stageRequest) {
-        Optional<BusinessProcess> businessProcess = bpRepository.findById(stageRequest.getBusinessProcessId());
+    private BusinessProcess getBusinessProcessIfExists(int businessProcessId) {
+        Optional<BusinessProcess> businessProcess = bpRepository.findById(businessProcessId);
         if (businessProcess.isEmpty()) {
             //todo
             throw new RuntimeException("bp not found");

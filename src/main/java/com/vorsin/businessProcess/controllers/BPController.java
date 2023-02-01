@@ -35,21 +35,16 @@ public class BPController {
         return bpService.getBusinessProcesses();
     }
 
-    @PostMapping("/new")
-    public ResponseEntity<HttpStatus> createBusinessProcess(@RequestBody @Valid BPRequest bpRequest,
-                                                            BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            //todo throw response
-            System.out.println("error create bp!!");
-        }
+    @PostMapping()
+    public ResponseEntity<HttpStatus> createBusinessProcess(@RequestBody @Valid BPRequest bpRequest) {
         bpService.createBusinessProcess(bpRequest);
         return ResponseEntity.ok(HttpStatus.CREATED);
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<HttpStatus> updateBusinessProcess( @PathVariable("id") int id,
-                                                             @RequestBody @Valid BPRequest bpRequest) {
-        bpService.updateBusinessProcess(bpRequest, id);
+    public ResponseEntity<HttpStatus> updateBusinessProcess(@PathVariable("id") int id,
+                                                            @RequestBody @Valid BPRequest bpRequest) {
+        bpService.updateBusinessProcess(id, bpRequest);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 

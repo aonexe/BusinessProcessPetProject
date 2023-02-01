@@ -36,7 +36,7 @@ public class UserController {
         return userService.getUsers();
     }
 
-    @PostMapping("/new")
+    @PostMapping()
     public ResponseEntity<HttpStatus> createUser(@RequestBody @Valid UserRequest userRequest,
                                                      BindingResult bindingResult) {
 

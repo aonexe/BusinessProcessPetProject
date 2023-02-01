@@ -1,8 +1,8 @@
 package com.vorsin.businessProcess.controllers;
 
-import com.vorsin.businessProcess.dto.StageRequest;
-import com.vorsin.businessProcess.dto.StageResponse;
-import com.vorsin.businessProcess.services.StageService;
+import com.vorsin.businessProcess.dto.ActionRequest;
+import com.vorsin.businessProcess.dto.ActionResponse;
+import com.vorsin.businessProcess.services.ActionService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,39 +19,40 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/stages")
-public class StageController {
+@RequestMapping("/actions")
+public class ActionController {
 
-    private final StageService stageService;
+    private final ActionService actionService;
 
     @Autowired
-    public StageController(StageService stageService) {
-        this.stageService = stageService;
+    public ActionController(ActionService actionService) {
+        this.actionService = actionService;
     }
 
     @GetMapping()
-    public List<StageResponse> getStages() {
-        return stageService.getStages();
+    public List<ActionResponse> getStages() {
+        return actionService.getActions();
     }
 
     @PostMapping()
-    public ResponseEntity<HttpStatus> createStage(@RequestBody @Valid StageRequest stageRequest) {
+    public ResponseEntity<HttpStatus> createAction(@RequestBody @Valid ActionRequest actionRequest) {
 
         //todo binding result
-        stageService.createStage(stageRequest);
+        actionService.createAction(actionRequest);
         return ResponseEntity.ok(HttpStatus.CREATED);
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<HttpStatus> updateStage(@PathVariable("id") int id,
-                                                  @RequestBody @Valid StageRequest stageRequest) {
-        stageService.updateStage(id, stageRequest);
+    public ResponseEntity<HttpStatus> updateAction(@PathVariable("id") int id,
+                                                  @RequestBody @Valid ActionRequest actionRequest) {
+        actionService.updateAction(id, actionRequest);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<HttpStatus> deleteStage(@PathVariable("id") int id) {
-        stageService.deleteStage(id);
+        actionService.deleteAction(id);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 }
+

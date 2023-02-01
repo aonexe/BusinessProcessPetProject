@@ -13,35 +13,26 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
-@Table(name = "process_stage")
+@Table(name = "process_action")
 @Data
-public class Stage {
+public class Action {
 
     @Id
-    @Column(name = "stage_id")
+    @Column(name = "action_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "title")
-    @NotNull(message = "Title should not be empty")
-    @Size(max = 30, message = "Title should be less than 30 characters")
-    private String title;
-
-    @Column(name = "stage_result")
+    @Column(name = "action_result")
     @Enumerated(EnumType.STRING)
-    @NotNull(message = "Stage result should not be empty")
-    private StageResultEnum stageResult;
+    private ActionResultEnum actionResult;
 
     @Column(name = "created_at")
     @NotNull(message = "Created at time should not be empty")
@@ -63,16 +54,17 @@ public class Stage {
     @JsonIgnore
     private User updatedWho;
 
-    @JoinColumn(name = "process_id", referencedColumnName = "process_id")
+    @JoinColumn(name = "stage_id", referencedColumnName = "stage_id")
     @ManyToOne(fetch = FetchType.EAGER)
-    @NotNull(message = "Business process should not be empty")
     @JsonBackReference
-    private BusinessProcess businessProcess;
+    @NotNull(message = "Stage should not be empty")
+    private Stage stage;
 
-    @OneToMany(mappedBy = "stage", fetch = FetchType.LAZY)
+    @JoinColumn(name = "task_owner_id", referencedColumnName = "user_id")
+    @ManyToOne(fetch = FetchType.EAGER)
     @JsonManagedReference
-    private List<Action> actions;
+    @NotNull(message = "Task owner should not be empty")
+    private User taskOwner;
 
 }
-
 
