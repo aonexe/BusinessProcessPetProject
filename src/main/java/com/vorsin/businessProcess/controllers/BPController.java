@@ -36,12 +36,7 @@ public class BPController {
     }
 
     @PostMapping()
-    public ResponseEntity<HttpStatus> createBusinessProcess(@RequestBody @Valid BPRequest bpRequest,
-                                                            BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            //todo throw response
-            System.out.println("error create bp!!");
-        }
+    public ResponseEntity<HttpStatus> createBusinessProcess(@RequestBody @Valid BPRequest bpRequest) {
         bpService.createBusinessProcess(bpRequest);
         return ResponseEntity.ok(HttpStatus.CREATED);
     }

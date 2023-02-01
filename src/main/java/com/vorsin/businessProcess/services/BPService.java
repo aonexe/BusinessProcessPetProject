@@ -37,6 +37,11 @@ public class BPService {
 
     @Transactional
     public void createBusinessProcess(BPRequest bpRequest) {
+        if (bpRequest.getTitle().equals("")) {
+
+            //todo
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY);
+        }
         if (bpRepository.existsByTitle(bpRequest.getTitle())) {
             //todo custom exception
             throw new ResponseStatusException(HttpStatus.CONFLICT);
@@ -48,10 +53,10 @@ public class BPService {
     }
 
     @Transactional
-    public void updateBusinessProcess(int id, BPRequest bpRequest ) {
+    public void updateBusinessProcess(int id, BPRequest bpRequest) {
         if (bpRepository.existsById(id)) {
             //todo custom exception
-            if (bpRepository.existsByTitle(bpRequest.getTitle())){
+            if (bpRepository.existsByTitle(bpRequest.getTitle())) {
                 throw new ResponseStatusException(HttpStatus.CONFLICT);
             }
             BusinessProcess businessProcess = bpRepository.findById(id).get();
