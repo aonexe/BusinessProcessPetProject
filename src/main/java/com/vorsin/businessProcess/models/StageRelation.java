@@ -1,12 +1,8 @@
 package com.vorsin.businessProcess.models;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -16,23 +12,36 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "action")
+@Table(name = "stage_relation")
 @Data
-public class Action {
+public class StageRelation {
 
     @Id
-    @Column(name = "action_id")
+    @Column(name = "stage_relation_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "action_result")
-    @Enumerated(EnumType.STRING)
-    private ActionResultEnum actionResult;
+    //todo custom from stage1 to stage2
+    @Column(name = "title")
+    @NotNull(message = "Title should not be empty")
+    @Size(max = 70, message = "Title should be less than 70 characters")
+    private String title;
+
+    @JoinColumn(name = "from_stage", referencedColumnName = "stage_id")
+    @ManyToOne
+    @NotNull(message = "Stage should not be empty")
+    private Stage fromStage;
+
+    @JoinColumn(name = "to_stage", referencedColumnName = "stage_id")
+    @ManyToOne
+    @NotNull(message = "Stage should not be empty")
+    private Stage toStage;
 
     @Column(name = "created_at")
     @NotNull(message = "Created at time should not be empty")
@@ -54,17 +63,4 @@ public class Action {
     @JsonIgnore
     private User updatedWho;
 
-    @JoinColumn(name = "stage_id", referencedColumnName = "stage_id")
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JsonBackReference
-    @NotNull(message = "Stage should not be empty")
-    private Stage stage;
-
-    @JoinColumn(name = "task_owner_id", referencedColumnName = "user_id")
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JsonManagedReference
-    @NotNull(message = "Task owner should not be empty")
-    private User taskOwner;
-
 }
-

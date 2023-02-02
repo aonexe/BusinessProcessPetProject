@@ -4,11 +4,11 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 
 @Getter
-public class ActionRequest {
+public class StageRelationRequest {
 
     @NotNull(message = "Stage should not be empty")
-    private int stageId;
+    private int fromStageId;
 
-    @NotNull(message = "Task owner should not be empty")
-    private int taskOwnerId;
+    @NotNull(message = "Stage should not be empty")
+    private int toStageId;
 }

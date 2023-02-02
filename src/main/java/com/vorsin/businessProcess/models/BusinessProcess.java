@@ -27,7 +27,7 @@ public class BusinessProcess {
     @Id
     @Column(name = "process_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private  int id;
+    private int id;
 
     @Column(name = "title")
     @NotNull

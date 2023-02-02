@@ -1,7 +1,6 @@
 package com.vorsin.businessProcess.dto;
 
 import com.vorsin.businessProcess.models.Action;
-import com.vorsin.businessProcess.models.BusinessProcess;
 import com.vorsin.businessProcess.models.StageResultEnum;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -25,5 +24,7 @@ public class StageResponse {
     private StageResultEnum stageResult;
 
     private List<Action> actions;
+
+//    private List<StageRelation> stageRelations;
 
 }

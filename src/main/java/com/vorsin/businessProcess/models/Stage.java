@@ -24,7 +24,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Table(name = "process_stage")
+@Table(name = "stage")
 @Data
 public class Stage {
 
@@ -72,6 +72,11 @@ public class Stage {
     @OneToMany(mappedBy = "stage", fetch = FetchType.LAZY)
     @JsonManagedReference
     private List<Action> actions;
+
+//    @OneToMany(mappedBy = "toStage", fetch = FetchType.LAZY)
+//    //todo
+//    @JsonIgnore
+//    private List<StageRelation> stageRelations;
 
 }
 

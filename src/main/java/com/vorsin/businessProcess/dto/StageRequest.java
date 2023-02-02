@@ -2,7 +2,9 @@ package com.vorsin.businessProcess.dto;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.Getter;
 
+@Getter
 public class StageRequest {
 
     @NotNull(message = "Title should not be empty")
@@ -12,26 +14,4 @@ public class StageRequest {
     @NotNull(message = "Business process should not be empty")
     private int businessProcessId;
 
-    public StageRequest() {}
-
-    public StageRequest(String title, int businessProcessId) {
-        this.title = title;
-        this.businessProcessId = businessProcessId;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public int getBusinessProcessId() {
-        return businessProcessId;
-    }
-
-    public void setBusinessProcessId(int businessProcessId) {
-        this.businessProcessId = businessProcessId;
-    }
 }
