@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,7 +31,9 @@ public class UserService {
     }
 
     public List<UserResponse> getUsers() {
-        return userRepository.findAll().stream().map(this::convertToUserResponse).collect(Collectors.toList());
+        return userRepository.findAll()
+                .stream().map(user -> modelMapper.map(user, UserResponse.class))
+                .collect(Collectors.toList());
     }
 
     @Transactional
@@ -46,13 +49,14 @@ public class UserService {
     }
 
     @Transactional
-    public void updateUser(UserRequest userRequest, int id) {
+    public void updateUser(int id, UserRequest userRequest) {
         if (userRepository.existsById(id)) {
-            if (userRepository.existsByUsernameOrEmail(userRequest.getUsername(), userRequest.getEmail())){
+            if (userRepository.existsByUsernameOrEmail(userRequest.getUsername(), userRequest.getEmail())) {
                 throw new ResponseStatusException(HttpStatus.CONFLICT);
             }
             User user = userRepository.findById(id).get();
-            initUser(user, userRequest);
+            modifyUser(user, userRequest.getFirstName(), userRequest.getLastName(), userRequest.getDateOfBirth(),
+                    userRequest.getEmail(), userRequest.getUsername(), userRequest.getPassword());
             userRepository.save(user);
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
@@ -63,15 +67,10 @@ public class UserService {
     public void deleteUser(int id) {
         if (userRepository.existsById(id)) {
             userRepository.deleteById(id);
-        }  else {
+        } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
     }
-
-    private UserResponse convertToUserResponse(User user) {
-        return modelMapper.map(user, UserResponse.class);
-    }
-
 
     private void initNewUser(User newUser) {
         newUser.setCreatedAt(LocalDateTime.now());
@@ -80,14 +79,15 @@ public class UserService {
         newUser.setUserRole(UserRoleEnum.USER);
     }
 
-    private void initUser(User user, UserRequest userRequest) {
+    private void modifyUser(User user, String firstName, String lastName, Date dateOfBirth,
+                            String email, String username, String password) {
 
-        user.setFirstName(userRequest.getFirstName());
-        user.setLastName(userRequest.getLastName());
-        user.setDateOfBirth(userRequest.getDateOfBirth());
-        user.setEmail(userRequest.getEmail());
-        user.setUsername(userRequest.getUsername());
-        user.setPassword(userRequest.getPassword());
+        user.setFirstName(firstName);
+        user.setLastName(lastName);
+        user.setDateOfBirth(dateOfBirth);
+        user.setEmail(email);
+        user.setUsername(username);
+        user.setPassword(password);
 
         user.setUpdatedAt(LocalDateTime.now());
         //todo current user from auth

@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -34,30 +36,46 @@ public class StageRelationService {
         this.modelMapper = modelMapper;
     }
 
-    public List<StageRelationResponse> getStageRelations() {
-        return stageRelationRepository.findAll().stream().map(this::convertToStageRelationResponse)
+    public List<StageRelationResponse> getStagesRelations() {
+        return stageRelationRepository.findAll()
+                .stream().map(stageRelation -> modelMapper.map(stageRelation, StageRelationResponse.class))
                 .collect(Collectors.toList());
     }
 
     public void createStageRelation(StageRelationRequest stageRelationRequest) {
 
         // Проверяем, что Stages существуют
-        checkIfStagesExists(stageRelationRequest.getFromStageId(), stageRelationRequest.getToStageId());
+        List<Integer> stagesId = new ArrayList<>
+                (Arrays.asList(stageRelationRequest.getFromStageId(), stageRelationRequest.getToStageId()));
+        checkIfStagesExists(stagesId);
+
+        // Проверяем, что Stages из одного БП
+        checkIfStagesFromDifferentBP(stageRelationRequest.getFromStageId(), stageRelationRequest.getToStageId());
 
         StageRelation stageRelation = modelMapper.map(stageRelationRequest, StageRelation.class);
-        initNewStageRelation(stageRelation, stageRelationRequest);
+        initNewStageRelation(stageRelation, stageRelationRequest.getTitle(),
+                stageRelationRequest.getFromStageId(), stageRelationRequest.getToStageId());
+
         stageRelationRepository.save(stageRelation);
     }
 
     public void updateStageRelation(int id, StageRelationRequest stageRelationRequest) {
 
-        // Проверяем, что Stages существуют
-        checkIfStagesExists(stageRelationRequest.getFromStageId(), stageRelationRequest.getToStageId());
-
         Optional<StageRelation> stageRelation = stageRelationRepository.findById(id);
         if (stageRelation.isPresent()) {
-            initStage(stageRelation.get(), stageRelationRequest);
+
+            // Проверяем, что Stages существуют
+            List<Integer> stagesId = new ArrayList<>
+                    (Arrays.asList(stageRelationRequest.getFromStageId(), stageRelationRequest.getToStageId()));
+            checkIfStagesExists(stagesId);
+
+            // Проверяем, что Stages из одного БП
+            checkIfStagesFromDifferentBP(stageRelationRequest.getFromStageId(), stageRelationRequest.getToStageId());
+
+            modifyStageRelation(stageRelation.get(), stageRelationRequest.getTitle(),
+                    stageRelationRequest.getFromStageId(), stageRelationRequest.getToStageId());
             stageRelationRepository.save(stageRelation.get());
+
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
@@ -71,33 +89,36 @@ public class StageRelationService {
         }
     }
 
-    private StageRelationResponse convertToStageRelationResponse(StageRelation stageRelation) {
-        return modelMapper.map(stageRelation, StageRelationResponse.class);
-    }
+    private void initNewStageRelation(StageRelation newStageRelation,
+                                      String title, int fromStageId, int toStageId) {
 
+        // Присваеваем сгенерированный Title, если он не указан
+        if (title == null) {
 
-    private void initNewStageRelation(StageRelation stageRelation, StageRelationRequest stageRelationRequest) {
+            newStageRelation.setTitle
+                    (generateTitle(fromStageId, toStageId));
+        } else {
+            newStageRelation.setTitle(title);
+        }
 
-        // Присваеваем сгенерированный Title
-        stageRelation.setTitle
-                (generateTitle(stageRelationRequest.getFromStageId(), stageRelationRequest.getToStageId()));
+        newStageRelation.setFromStage(getStage(fromStageId));
+        newStageRelation.setToStage(getStage(toStageId));
 
-        stageRelation.setFromStage(getStage(stageRelationRequest.getFromStageId()));
-        stageRelation.setToStage(getStage(stageRelationRequest.getToStageId()));
-
-        stageRelation.setCreatedAt(LocalDateTime.now());
+        newStageRelation.setCreatedAt(LocalDateTime.now());
         //todo current user from auth
-        stageRelation.setCreatedWho(userRepository.findById(2).get());
+        newStageRelation.setCreatedWho(userRepository.findById(2).get());
     }
 
-    private void initStage(StageRelation stageRelation, StageRelationRequest stageRelationRequest) {
+    private void modifyStageRelation(StageRelation stageRelation, String title, int fromStageId, int toStageId) {
 
-        // Обновляем Title
-        stageRelation.setTitle
-                (generateTitle(stageRelationRequest.getFromStageId(), stageRelationRequest.getToStageId()));
+        // Обновляем Title, если указали новый
 
-        stageRelation.setFromStage(getStage(stageRelationRequest.getFromStageId()));
-        stageRelation.setToStage(getStage(stageRelationRequest.getToStageId()));
+        if (title != null && !title.equals(stageRelation.getTitle())) {
+            stageRelation.setTitle(title);
+        }
+
+        stageRelation.setFromStage(getStage(fromStageId));
+        stageRelation.setToStage(getStage(toStageId));
 
         stageRelation.setUpdatedAt(LocalDateTime.now());
         //todo current user from auth
@@ -108,14 +129,24 @@ public class StageRelationService {
     private Stage getStage(int stageId) {
         return stageRepository.findById(stageId).get();
     }
-    private void checkIfStagesExists(int fromStageId, int toStageId) {
-        if (!stageRepository.existsById(fromStageId)) {
-            //todo
-            throw new RuntimeException("fromstage not found");
+
+    private void checkIfStagesExists(List<Integer> listID) {
+        for (int id : listID) {
+            if (!stageRepository.existsById(id)) {
+                //todo
+                throw new RuntimeException("Stage not found");
+            }
         }
-        if (!stageRepository.existsById(toStageId)) {
+    }
+
+    private void checkIfStagesFromDifferentBP(int fromStageId, int toStageId) {
+
+        int bpIdFromStage = stageRepository.findProcessIdByStageId(fromStageId);
+        int bpIdToStage = stageRepository.findProcessIdByStageId(toStageId);
+
+        if (bpIdFromStage != bpIdToStage) {
             //todo
-            throw new RuntimeException("tostage  not found");
+            throw new RuntimeException("stages from different bp!!!");
         }
     }
 
@@ -123,8 +154,7 @@ public class StageRelationService {
         String fromStageTitle = stageRepository.findById(fromStageId).get().getTitle();
         String toStageTitle = stageRepository.findById(toStageId).get().getTitle();
 
-
         return "From " + fromStageTitle + " to " + toStageTitle;
-
     }
+
 }

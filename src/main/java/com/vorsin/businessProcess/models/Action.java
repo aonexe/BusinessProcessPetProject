@@ -62,7 +62,7 @@ public class Action {
 
     @JoinColumn(name = "task_owner_id", referencedColumnName = "user_id")
     @ManyToOne(fetch = FetchType.EAGER)
-    @JsonManagedReference
+    @JsonBackReference
     @NotNull(message = "Task owner should not be empty")
     private User taskOwner;
 

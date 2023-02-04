@@ -50,5 +50,4 @@ CREATE TABLE action
     updated_at    TIMESTAMP,
     updated_who   INT                                                         DEFAULT NULL,
     FOREIGN KEY (updated_who) REFERENCES bp_user (user_id)
-
 );

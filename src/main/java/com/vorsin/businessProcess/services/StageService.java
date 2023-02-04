@@ -2,7 +2,6 @@ package com.vorsin.businessProcess.services;
 
 import com.vorsin.businessProcess.dto.StageRequest;
 import com.vorsin.businessProcess.dto.StageResponse;
-import com.vorsin.businessProcess.models.BusinessProcess;
 import com.vorsin.businessProcess.models.Stage;
 import com.vorsin.businessProcess.models.StageResultEnum;
 import com.vorsin.businessProcess.repositories.BPRepository;
@@ -12,7 +11,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
@@ -38,7 +36,8 @@ public class StageService {
     }
 
     public List<StageResponse> getStages() {
-        return stageRepository.findAll().stream().map(this::convertToStageResponse)
+        return stageRepository.findAll()
+                .stream().map(stage -> modelMapper.map(stage, StageResponse.class))
                 .collect(Collectors.toList());
     }
 
@@ -54,7 +53,7 @@ public class StageService {
         Optional<Stage> stage = stageRepository.findById(id);
         if (stage.isPresent()) {
             checkIfBusinessProcessExists(stageRequest.getBusinessProcessId());
-            initStage(stage.get(), stageRequest.getBusinessProcessId(), stageRequest.getTitle());
+            modifyStage(stage.get(), stageRequest.getBusinessProcessId(), stageRequest.getTitle());
             stageRepository.save(stage.get());
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
@@ -69,23 +68,17 @@ public class StageService {
         }
     }
 
-    private StageResponse convertToStageResponse(Stage stage) {
+    private void initNewStage(Stage newStage, int businessProcessId) {
 
-        return modelMapper.map(stage, StageResponse.class);
-    }
+        newStage.setBusinessProcess(bpRepository.findById(businessProcessId).get());
 
-
-    private void initNewStage(Stage stage, int businessProcessId) {
-
-        stage.setBusinessProcess(bpRepository.findById(businessProcessId).get());
-
-        stage.setCreatedAt(LocalDateTime.now());
+        newStage.setCreatedAt(LocalDateTime.now());
         //todo current user from auth
-        stage.setCreatedWho(userRepository.findById(2).get());
-        stage.setStageResult(StageResultEnum.NOT_STARTED);
+        newStage.setCreatedWho(userRepository.findById(2).get());
+        newStage.setStageResult(StageResultEnum.NOT_STARTED);
     }
 
-    private void initStage(Stage stage, int businessProcessId, String title) {
+    private void modifyStage(Stage stage, int businessProcessId, String title) {
 
         stage.setBusinessProcess(bpRepository.findById(businessProcessId).get());
         stage.setTitle(title);

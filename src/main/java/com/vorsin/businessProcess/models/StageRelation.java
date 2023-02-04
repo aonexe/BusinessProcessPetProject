@@ -1,5 +1,6 @@
 package com.vorsin.businessProcess.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -29,18 +30,19 @@ public class StageRelation {
 
     //todo custom from stage1 to stage2
     @Column(name = "title")
-    @NotNull(message = "Title should not be empty")
     @Size(max = 70, message = "Title should be less than 70 characters")
     private String title;
 
     @JoinColumn(name = "from_stage", referencedColumnName = "stage_id")
     @ManyToOne
     @NotNull(message = "Stage should not be empty")
+    @JsonBackReference
     private Stage fromStage;
 
     @JoinColumn(name = "to_stage", referencedColumnName = "stage_id")
     @ManyToOne
     @NotNull(message = "Stage should not be empty")
+    @JsonBackReference
     private Stage toStage;
 
     @Column(name = "created_at")

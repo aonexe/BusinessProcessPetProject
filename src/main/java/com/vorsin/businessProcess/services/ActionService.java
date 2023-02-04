@@ -36,20 +36,21 @@ public class ActionService {
     }
 
     public List<ActionResponse> getActions() {
-        return actionRepository.findAll().stream().map(this::convertToActionResponse)
+        return actionRepository.findAll()
+                .stream().map(action -> modelMapper.map(action, ActionResponse.class))
                 .collect(Collectors.toList());
     }
 
     public void createAction(ActionRequest actionRequest) {
-        Action action = modelMapper.map(actionRequest, Action.class);
-        initNewAction(action, actionRequest);
-        actionRepository.save(action);
+        Action newAction = modelMapper.map(actionRequest, Action.class);
+        initNewAction(newAction, actionRequest.getStageId(), actionRequest.getTaskOwnerId());
+        actionRepository.save(newAction);
     }
 
     public void updateAction(int id, ActionRequest actionRequest) {
         Optional<Action> action = actionRepository.findById(id);
         if (action.isPresent()) {
-            initAction(action.get(), actionRequest);
+            modifyAction(action.get(), actionRequest.getStageId(), actionRequest.getTaskOwnerId());
             actionRepository.save(action.get());
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
@@ -64,27 +65,23 @@ public class ActionService {
         }
     }
 
-    private ActionResponse convertToActionResponse(Action action) {
-        return modelMapper.map(action, ActionResponse.class);
+    private void initNewAction(Action newAction, int stageId, int taskOwnerId) {
+
+        newAction.setStage(getStageIfExists(stageId));
+        newAction.setTaskOwner(getUserIfExists(taskOwnerId));
+
+        newAction.setCreatedAt(LocalDateTime.now());
+        // todo current user from auth
+        newAction.setCreatedWho(userRepository.findById(2).get());
+
+        newAction.setActionResult(null);
     }
 
-    private void initNewAction(Action action, ActionRequest actionRequest) {
+    private void modifyAction(Action action, int stageId, int taskOwnerId) {
 
-        action.setStage(getStageIfExists(actionRequest.getStageId()));
-        action.setTaskOwner(getUserIfExists(actionRequest.getTaskOwnerId()));
+        action.setStage(getStageIfExists(stageId));
 
-        action.setCreatedAt(LocalDateTime.now());
-        //todo current user from auth
-        action.setCreatedWho(userRepository.findById(2).get());
-
-        action.setActionResult(null);
-    }
-
-    private void initAction(Action action, ActionRequest actionRequest) {
-
-        action.setStage(getStageIfExists(actionRequest.getStageId()));
-
-        action.setTaskOwner(getUserIfExists(actionRequest.getTaskOwnerId()));
+        action.setTaskOwner(getUserIfExists(taskOwnerId));
 
         action.setUpdatedAt(LocalDateTime.now());
         //todo current user from auth

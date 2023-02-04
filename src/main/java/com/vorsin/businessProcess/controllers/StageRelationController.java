@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/stage-relations")
+@RequestMapping("/stages-relations")
 public class StageRelationController {
 
     private final StageRelationService stageRelationService;
@@ -30,26 +30,26 @@ public class StageRelationController {
     }
 
     @GetMapping()
-    public List<StageRelationResponse> getStageRelations() {
-        return stageRelationService.getStageRelations();
+    public List<StageRelationResponse> getStagesRelations() {
+        return stageRelationService.getStagesRelations();
     }
 
     @PostMapping()
-    public ResponseEntity<HttpStatus> createStage(@RequestBody @Valid StageRelationRequest stageRelationRequest) {
+    public ResponseEntity<HttpStatus> createStageRelation(@RequestBody @Valid StageRelationRequest stageRelationRequest) {
         //todo binding result
         stageRelationService.createStageRelation(stageRelationRequest);
         return ResponseEntity.ok(HttpStatus.CREATED);
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<HttpStatus> updateStage(@PathVariable("id") int id,
+    public ResponseEntity<HttpStatus> updateStageRelation(@PathVariable("id") int id,
                                                   @RequestBody @Valid StageRelationRequest stageRelationRequest) {
         stageRelationService.updateStageRelation(id, stageRelationRequest);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<HttpStatus> deleteStage(@PathVariable("id") int id) {
+    public ResponseEntity<HttpStatus> deleteStageRelation(@PathVariable("id") int id) {
         stageRelationService.deleteStageRelation(id);
         return ResponseEntity.ok(HttpStatus.OK);
     }

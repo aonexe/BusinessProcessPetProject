@@ -1,7 +1,5 @@
 package com.vorsin.businessProcess.dto;
 
-import com.vorsin.businessProcess.models.Action;
-import com.vorsin.businessProcess.models.User;
 import com.vorsin.businessProcess.models.UserRoleEnum;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
@@ -11,7 +9,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import java.time.LocalDateTime;
 import java.util.Date;
 
 @Getter
