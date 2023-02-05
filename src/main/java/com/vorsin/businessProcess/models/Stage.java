@@ -24,7 +24,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Table(name = "process_stage")
+@Table(name = "stage")
 @Data
 public class Stage {
 
@@ -49,7 +49,7 @@ public class Stage {
     private LocalDateTime createdAt;
 
     @JoinColumn(name = "created_who", referencedColumnName = "user_id")
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.LAZY)
     @NotNull(message = "Creator should not be empty")
     @JsonIgnore
     private User createdWho;
@@ -59,12 +59,13 @@ public class Stage {
     private LocalDateTime updatedAt;
 
     @JoinColumn(name = "updated_who", referencedColumnName = "user_id")
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.LAZY)
     @JsonIgnore
     private User updatedWho;
 
+    //todo rename to business_process_id
     @JoinColumn(name = "process_id", referencedColumnName = "process_id")
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @NotNull(message = "Business process should not be empty")
     @JsonBackReference
     private BusinessProcess businessProcess;
@@ -72,6 +73,14 @@ public class Stage {
     @OneToMany(mappedBy = "stage", fetch = FetchType.LAZY)
     @JsonManagedReference
     private List<Action> actions;
+
+    @OneToMany(mappedBy = "fromStage", fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private List<StageRelation> stageRelationsFrom;
+
+    @OneToMany(mappedBy = "toStage", fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private List<StageRelation> stageRelationsTo;
 
 }
 

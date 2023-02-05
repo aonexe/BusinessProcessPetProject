@@ -14,7 +14,7 @@ public class ActionResponse {
     @NotNull(message = "Id should not be empty")
     private int id;
 
-    @NotNull(message = "Stage result should not be empty")
+    @NotNull(message = "Action result should not be empty")
     private ActionResultEnum actionResult;
 
     @NotNull(message = "Task owner should not be empty")

@@ -24,10 +24,11 @@ import java.util.List;
 @Data
 public class BusinessProcess {
 
+    //todo rename to business_process_id
     @Id
     @Column(name = "process_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private  int id;
+    private int id;
 
     @Column(name = "title")
     @NotNull
@@ -48,7 +49,6 @@ public class BusinessProcess {
     @Column(name = "updated_at")
     @JsonIgnore
     private LocalDateTime updatedAt;
-
 
     @JoinColumn(name = "updated_who", referencedColumnName = "user_id")
     @OneToOne(fetch = FetchType.EAGER)

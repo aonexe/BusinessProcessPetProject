@@ -2,7 +2,6 @@ package com.vorsin.businessProcess.services;
 
 import com.vorsin.businessProcess.dto.StageRequest;
 import com.vorsin.businessProcess.dto.StageResponse;
-import com.vorsin.businessProcess.models.BusinessProcess;
 import com.vorsin.businessProcess.models.Stage;
 import com.vorsin.businessProcess.models.StageResultEnum;
 import com.vorsin.businessProcess.repositories.BPRepository;
@@ -37,20 +36,24 @@ public class StageService {
     }
 
     public List<StageResponse> getStages() {
-        return stageRepository.findAll().stream().map(this::convertToStageResponse)
+        return stageRepository.findAll()
+                .stream().map(stage -> modelMapper.map(stage, StageResponse.class))
                 .collect(Collectors.toList());
     }
 
+
     public void createStage(StageRequest stageRequest) {
-        Stage stage = modelMapper.map(stageRequest, Stage.class);
-        initNewStage(stage, stageRequest);
-        stageRepository.save(stage);
+        checkIfBusinessProcessExists(stageRequest.getBusinessProcessId());
+        Stage newStage = modelMapper.map(stageRequest, Stage.class);
+        initNewStage(newStage, stageRequest.getBusinessProcessId());
+        stageRepository.save(newStage);
     }
 
     public void updateStage(int id, StageRequest stageRequest) {
         Optional<Stage> stage = stageRepository.findById(id);
         if (stage.isPresent()) {
-            initStage(stage.get(), stageRequest);
+            checkIfBusinessProcessExists(stageRequest.getBusinessProcessId());
+            modifyStage(stage.get(), stageRequest.getBusinessProcessId(), stageRequest.getTitle());
             stageRepository.save(stage.get());
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
@@ -65,27 +68,20 @@ public class StageService {
         }
     }
 
-    private StageResponse convertToStageResponse(Stage stage) {
+    private void initNewStage(Stage newStage, int businessProcessId) {
 
-        return modelMapper.map(stage, StageResponse.class);
-    }
+        newStage.setBusinessProcess(bpRepository.findById(businessProcessId).get());
 
-
-    private void initNewStage(Stage stage, StageRequest stageRequest) {
-
-        stage.setBusinessProcess(getBusinessProcessIfExists(stageRequest.getBusinessProcessId()));
-
-        stage.setCreatedAt(LocalDateTime.now());
+        newStage.setCreatedAt(LocalDateTime.now());
         //todo current user from auth
-        stage.setCreatedWho(userRepository.findById(2).get());
-        stage.setStageResult(StageResultEnum.NOT_STARTED);
+        newStage.setCreatedWho(userRepository.findById(2).get());
+        newStage.setStageResult(StageResultEnum.NOT_STARTED);
     }
 
-    private void initStage(Stage stage, StageRequest stageRequest) {
+    private void modifyStage(Stage stage, int businessProcessId, String title) {
 
-        stage.setBusinessProcess(getBusinessProcessIfExists(stageRequest.getBusinessProcessId()));
-
-        stage.setTitle(stageRequest.getTitle());
+        stage.setBusinessProcess(bpRepository.findById(businessProcessId).get());
+        stage.setTitle(title);
 
         stage.setUpdatedAt(LocalDateTime.now());
         //todo current user from auth
@@ -93,13 +89,10 @@ public class StageService {
 
     }
 
-    private BusinessProcess getBusinessProcessIfExists(int businessProcessId) {
-        Optional<BusinessProcess> businessProcess = bpRepository.findById(businessProcessId);
-        if (businessProcess.isEmpty()) {
-            //todo
+    private void checkIfBusinessProcessExists(int businessProcessId) {
+        if (!bpRepository.existsById(businessProcessId)) {
             throw new RuntimeException("bp not found");
         }
-        return businessProcess.get();
     }
 
 }

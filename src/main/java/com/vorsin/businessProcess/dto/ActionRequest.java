@@ -6,7 +6,7 @@ import lombok.Getter;
 @Getter
 public class ActionRequest {
 
-    @NotNull(message = "Stage process should not be empty")
+    @NotNull(message = "Stage should not be empty")
     private int stageId;
 
     @NotNull(message = "Task owner should not be empty")

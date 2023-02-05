@@ -31,13 +31,14 @@ public class BPService {
     }
 
     public List<BPResponse> getBusinessProcesses() {
-        return bpRepository.findAll().stream().map(this::convertToBPResponse)
+        return bpRepository.findAll()
+                .stream().map(businessProcess -> modelMapper.map(businessProcess, BPResponse.class))
                 .collect(Collectors.toList());
     }
 
     @Transactional
     public void createBusinessProcess(BPRequest bpRequest) {
-        if (bpRequest.getTitle().equals("")) {
+        if (bpRequest.getTitle().trim().equals("")) {
 
             //todo
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY);
@@ -60,7 +61,7 @@ public class BPService {
                 throw new ResponseStatusException(HttpStatus.CONFLICT);
             }
             BusinessProcess businessProcess = bpRepository.findById(id).get();
-            initBusinessProcess(businessProcess, bpRequest);
+            modifyBusinessProcess(businessProcess, bpRequest.getTitle());
             bpRepository.save(businessProcess);
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
@@ -77,20 +78,16 @@ public class BPService {
     }
 
 
-    private BPResponse convertToBPResponse(BusinessProcess businessProcess) {
-        return modelMapper.map(businessProcess, BPResponse.class);
-    }
-
-    private void initNewBusinessProcess(BusinessProcess businessProcess) {
-        businessProcess.setCreatedAt(LocalDateTime.now());
+    private void initNewBusinessProcess(BusinessProcess newBusinessProcess) {
+        newBusinessProcess.setCreatedAt(LocalDateTime.now());
 
         //todo current user from auth
-        businessProcess.setCreatedWho(userRepository.findById(2).get());
+        newBusinessProcess.setCreatedWho(userRepository.findById(2).get());
     }
 
-    private void initBusinessProcess(BusinessProcess businessProcess, BPRequest bpRequest) {
+    private void modifyBusinessProcess(BusinessProcess businessProcess, String title) {
 
-        businessProcess.setTitle(bpRequest.getTitle());
+        businessProcess.setTitle(title);
 
         //todo
         businessProcess.setUpdatedAt(LocalDateTime.now());

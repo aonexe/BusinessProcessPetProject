@@ -92,7 +92,7 @@ public class User {
     private User updatedWho;
 
     @OneToMany(mappedBy = "taskOwner", fetch = FetchType.EAGER)
-    @JsonBackReference
+    @JsonManagedReference
     private List<Action> actions;
 
 }
