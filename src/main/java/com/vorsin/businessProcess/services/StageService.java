@@ -3,9 +3,9 @@ package com.vorsin.businessProcess.services;
 import com.vorsin.businessProcess.dto.StageRequest;
 import com.vorsin.businessProcess.dto.StageResponse;
 import com.vorsin.businessProcess.models.Stage;
-import com.vorsin.businessProcess.models.StageResultEnum;
 import com.vorsin.businessProcess.repositories.BPRepository;
 import com.vorsin.businessProcess.repositories.StageRepository;
+import com.vorsin.businessProcess.repositories.StageResultRepository;
 import com.vorsin.businessProcess.repositories.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,14 +22,16 @@ import java.util.stream.Collectors;
 public class StageService {
 
     private final StageRepository stageRepository;
+    private final StageResultRepository stageResultRepository;
     private final UserRepository userRepository;
     private final BPRepository bpRepository;
     private final ModelMapper modelMapper;
 
 
     @Autowired
-    public StageService(StageRepository stageRepository, UserRepository userRepository, BPRepository bpRepository, ModelMapper modelMapper) {
+    public StageService(StageRepository stageRepository, StageResultRepository stageResultRepository, UserRepository userRepository, BPRepository bpRepository, ModelMapper modelMapper) {
         this.stageRepository = stageRepository;
+        this.stageResultRepository = stageResultRepository;
         this.userRepository = userRepository;
         this.bpRepository = bpRepository;
         this.modelMapper = modelMapper;
@@ -74,8 +76,9 @@ public class StageService {
 
         newStage.setCreatedAt(LocalDateTime.now());
         //todo current user from auth
-        newStage.setCreatedWho(userRepository.findById(2).get());
-        newStage.setStageResult(StageResultEnum.NOT_STARTED);
+        newStage.setCreatedWho(userRepository.findById(1).get());
+        //todo check
+        newStage.setStageResult(stageResultRepository.findByName("NOT_STARTED").get());
     }
 
     private void modifyStage(Stage stage, int businessProcessId, String title) {
@@ -85,7 +88,7 @@ public class StageService {
 
         stage.setUpdatedAt(LocalDateTime.now());
         //todo current user from auth
-        stage.setUpdatedWho(userRepository.findById(2).get());
+        stage.setUpdatedWho(userRepository.findById(1).get());
 
     }
 

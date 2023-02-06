@@ -72,7 +72,7 @@ public class ActionService {
 
         newAction.setCreatedAt(LocalDateTime.now());
         // todo current user from auth
-        newAction.setCreatedWho(userRepository.findById(2).get());
+        newAction.setCreatedWho(userRepository.findById(1).get());
 
         newAction.setActionResult(null);
     }
@@ -85,7 +85,7 @@ public class ActionService {
 
         action.setUpdatedAt(LocalDateTime.now());
         //todo current user from auth
-        action.setUpdatedWho(userRepository.findById(2).get());
+        action.setUpdatedWho(userRepository.findById(1).get());
 
     }
 

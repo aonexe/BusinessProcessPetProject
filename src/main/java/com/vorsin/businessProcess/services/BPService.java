@@ -38,7 +38,7 @@ public class BPService {
 
     @Transactional
     public void createBusinessProcess(BPRequest bpRequest) {
-        if (bpRequest.getTitle().trim().equals("")) {
+        if (bpRequest.getTitle().isBlank()) {
 
             //todo
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY);
@@ -82,7 +82,7 @@ public class BPService {
         newBusinessProcess.setCreatedAt(LocalDateTime.now());
 
         //todo current user from auth
-        newBusinessProcess.setCreatedWho(userRepository.findById(2).get());
+        newBusinessProcess.setCreatedWho(userRepository.findById(1).get());
     }
 
     private void modifyBusinessProcess(BusinessProcess businessProcess, String title) {
@@ -92,7 +92,7 @@ public class BPService {
         //todo
         businessProcess.setUpdatedAt(LocalDateTime.now());
         //todo current user from auth
-        businessProcess.setUpdatedWho(userRepository.findById(2).get());
+        businessProcess.setUpdatedWho(userRepository.findById(1).get());
     }
 
 }

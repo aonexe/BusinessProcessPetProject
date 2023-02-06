@@ -24,9 +24,8 @@ import java.util.List;
 @Data
 public class BusinessProcess {
 
-    //todo rename to business_process_id
     @Id
-    @Column(name = "process_id")
+    @Column(name = "business_process_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 

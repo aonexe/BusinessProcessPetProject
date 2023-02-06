@@ -2,7 +2,7 @@ package com.vorsin.businessProcess.dto;
 
 import com.vorsin.businessProcess.models.Action;
 import com.vorsin.businessProcess.models.StageRelation;
-import com.vorsin.businessProcess.models.StageResultEnum;
+import com.vorsin.businessProcess.models.StageResult;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
@@ -22,7 +22,7 @@ public class StageResponse {
     private String title;
 
     @NotNull(message = "Stage result should not be empty")
-    private StageResultEnum stageResult;
+    private StageResult stageResult;
 
     private List<Action> actions;
 

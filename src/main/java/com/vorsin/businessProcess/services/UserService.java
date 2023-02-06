@@ -66,6 +66,7 @@ public class UserService {
     @Transactional
     public void deleteUser(int id) {
         if (userRepository.existsById(id)) {
+            //todo Key  is still referenced from table
             userRepository.deleteById(id);
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
@@ -75,7 +76,7 @@ public class UserService {
     private void initNewUser(User newUser) {
         newUser.setCreatedAt(LocalDateTime.now());
         //todo current user from auth
-        newUser.setCreatedWho(userRepository.findById(2).get());
+        newUser.setCreatedWho(userRepository.findById(1).get());
         newUser.setUserRole(UserRoleEnum.USER);
     }
 
@@ -91,6 +92,6 @@ public class UserService {
 
         user.setUpdatedAt(LocalDateTime.now());
         //todo current user from auth
-        user.setUpdatedWho(userRepository.findById(2).get());
+        user.setUpdatedWho(userRepository.findById(1).get());
     }
 }

@@ -44,6 +44,12 @@ public class StageRelationService {
 
     public void createStageRelation(StageRelationRequest stageRelationRequest) {
 
+        // Проверяем, что связь не зацикливается на этапе
+        checkIfStagesDifferent(stageRelationRequest.getFromStageId(),stageRelationRequest.getToStageId());
+
+        // Проверяем, что такой связи нет
+        checkIfStageRelationExists(stageRelationRequest.getFromStageId(),stageRelationRequest.getToStageId());
+
         // Проверяем, что Stages существуют
         List<Integer> stagesId = new ArrayList<>
                 (Arrays.asList(stageRelationRequest.getFromStageId(), stageRelationRequest.getToStageId()));
@@ -63,6 +69,12 @@ public class StageRelationService {
 
         Optional<StageRelation> stageRelation = stageRelationRepository.findById(id);
         if (stageRelation.isPresent()) {
+
+            // Проверяем, что связь не зацикливается на этапе
+            checkIfStagesDifferent(stageRelationRequest.getFromStageId(),stageRelationRequest.getToStageId());
+
+            //Проверяем, что такой связи нет
+            checkIfStageRelationExists(stageRelationRequest.getFromStageId(),stageRelationRequest.getToStageId());
 
             // Проверяем, что Stages существуют
             List<Integer> stagesId = new ArrayList<>
@@ -106,13 +118,12 @@ public class StageRelationService {
 
         newStageRelation.setCreatedAt(LocalDateTime.now());
         //todo current user from auth
-        newStageRelation.setCreatedWho(userRepository.findById(2).get());
+        newStageRelation.setCreatedWho(userRepository.findById(1).get());
     }
 
     private void modifyStageRelation(StageRelation stageRelation, String title, int fromStageId, int toStageId) {
 
         // Обновляем Title, если указали новый
-
         if (title != null && !title.equals(stageRelation.getTitle())) {
             stageRelation.setTitle(title);
         }
@@ -122,7 +133,7 @@ public class StageRelationService {
 
         stageRelation.setUpdatedAt(LocalDateTime.now());
         //todo current user from auth
-        stageRelation.setUpdatedWho(userRepository.findById(2).get());
+        stageRelation.setUpdatedWho(userRepository.findById(1).get());
 
     }
 
@@ -139,6 +150,12 @@ public class StageRelationService {
         }
     }
 
+    private void checkIfStagesDifferent(int fromStageId, int toStageId) {
+        if (fromStageId== toStageId)
+            //todo custom exception
+            throw new RuntimeException("same stage");
+    }
+
     private void checkIfStagesFromDifferentBP(int fromStageId, int toStageId) {
 
         int bpIdFromStage = stageRepository.findProcessIdByStageId(fromStageId);
@@ -148,6 +165,13 @@ public class StageRelationService {
             //todo
             throw new RuntimeException("stages from different bp!!!");
         }
+    }
+
+    private void checkIfStageRelationExists(int fromStageId, int toStageId) {
+        //todo
+       if(stageRelationRepository.findStageRelationIfExists(fromStageId, toStageId).isPresent())
+           //todo custom exception
+           throw new ResponseStatusException(HttpStatus.CONFLICT);
     }
 
     private String generateTitle(int fromStageId, int toStageId) {
