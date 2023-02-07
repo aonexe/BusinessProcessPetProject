@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/stages-results")
+@RequestMapping("/stage-result")
 public class StageResultController {
 
     private final StageResultService stageResultService;

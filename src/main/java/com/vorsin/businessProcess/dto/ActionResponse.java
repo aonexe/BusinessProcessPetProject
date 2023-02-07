@@ -1,7 +1,6 @@
 package com.vorsin.businessProcess.dto;
 
-import com.vorsin.businessProcess.models.ActionResultEnum;
-import com.vorsin.businessProcess.models.Stage;
+import com.vorsin.businessProcess.models.ActionResult;
 import com.vorsin.businessProcess.models.User;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -15,7 +14,7 @@ public class ActionResponse {
     private int id;
 
     @NotNull(message = "Action result should not be empty")
-    private ActionResultEnum actionResult;
+    private ActionResult actionResult;
 
     @NotNull(message = "Task owner should not be empty")
     private User taskOwner;

@@ -45,10 +45,12 @@ public class StageRelationService {
     public void createStageRelation(StageRelationRequest stageRelationRequest) {
 
         // Проверяем, что связь не зацикливается на этапе
-        checkIfStagesDifferent(stageRelationRequest.getFromStageId(),stageRelationRequest.getToStageId());
+        if (stageRelationRequest.getFromStageId() == stageRelationRequest.getToStageId())
+            //todo custom exception
+            throw new RuntimeException("same stage");
 
         // Проверяем, что такой связи нет
-        checkIfStageRelationExists(stageRelationRequest.getFromStageId(),stageRelationRequest.getToStageId());
+        checkIfStageRelationDoesntExist(stageRelationRequest.getFromStageId(), stageRelationRequest.getToStageId());
 
         // Проверяем, что Stages существуют
         List<Integer> stagesId = new ArrayList<>
@@ -71,10 +73,12 @@ public class StageRelationService {
         if (stageRelation.isPresent()) {
 
             // Проверяем, что связь не зацикливается на этапе
-            checkIfStagesDifferent(stageRelationRequest.getFromStageId(),stageRelationRequest.getToStageId());
+            if (stageRelationRequest.getFromStageId() == stageRelationRequest.getToStageId())
+                //todo custom exception
+                throw new RuntimeException("same stage");
 
             //Проверяем, что такой связи нет
-            checkIfStageRelationExists(stageRelationRequest.getFromStageId(),stageRelationRequest.getToStageId());
+            checkIfStageRelationDoesntExist(stageRelationRequest.getFromStageId(), stageRelationRequest.getToStageId());
 
             // Проверяем, что Stages существуют
             List<Integer> stagesId = new ArrayList<>
@@ -150,12 +154,6 @@ public class StageRelationService {
         }
     }
 
-    private void checkIfStagesDifferent(int fromStageId, int toStageId) {
-        if (fromStageId== toStageId)
-            //todo custom exception
-            throw new RuntimeException("same stage");
-    }
-
     private void checkIfStagesFromDifferentBP(int fromStageId, int toStageId) {
 
         int bpIdFromStage = stageRepository.findProcessIdByStageId(fromStageId);
@@ -167,11 +165,11 @@ public class StageRelationService {
         }
     }
 
-    private void checkIfStageRelationExists(int fromStageId, int toStageId) {
+    private void checkIfStageRelationDoesntExist(int fromStageId, int toStageId) {
         //todo
-       if(stageRelationRepository.findStageRelationIfExists(fromStageId, toStageId).isPresent())
-           //todo custom exception
-           throw new ResponseStatusException(HttpStatus.CONFLICT);
+        if (stageRelationRepository.findStageRelationIfExists(fromStageId, toStageId).isPresent())
+            //todo custom exception
+            throw new ResponseStatusException(HttpStatus.CONFLICT);
     }
 
     private String generateTitle(int fromStageId, int toStageId) {
