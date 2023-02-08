@@ -2,6 +2,7 @@ package com.vorsin.businessProcess.services;
 
 import com.vorsin.businessProcess.dto.BPRequest;
 import com.vorsin.businessProcess.dto.BPResponse;
+import com.vorsin.businessProcess.exception.BusinessProcessException;
 import com.vorsin.businessProcess.models.BusinessProcess;
 import com.vorsin.businessProcess.repositories.BPRepository;
 import com.vorsin.businessProcess.repositories.UserRepository;
@@ -64,7 +65,7 @@ public class BPService {
             modifyBusinessProcess(businessProcess, bpRequest.getTitle());
             bpRepository.save(businessProcess);
         } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+            throw new BusinessProcessException("Business process not found", HttpStatus.NOT_FOUND);
         }
     }
 
@@ -73,7 +74,7 @@ public class BPService {
         if (bpRepository.existsById(id)) {
             bpRepository.deleteById(id);
         } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+            throw new BusinessProcessException("Business process not found", HttpStatus.NOT_FOUND);
         }
     }
 

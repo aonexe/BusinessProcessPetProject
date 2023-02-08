@@ -2,6 +2,7 @@ package com.vorsin.businessProcess.services;
 
 import com.vorsin.businessProcess.dto.StageResultRequest;
 import com.vorsin.businessProcess.dto.StageResultResponse;
+import com.vorsin.businessProcess.exception.StageResultException;
 import com.vorsin.businessProcess.models.StageResult;
 import com.vorsin.businessProcess.repositories.StageResultRepository;
 import com.vorsin.businessProcess.repositories.UserRepository;
@@ -57,7 +58,7 @@ public class StageResultService {
             modifyStageResult(stageResult.get(), stageResultRequest.getName());
             stageResultRepository.save(stageResult.get());
         } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+            throw new StageResultException("Stage result not found", HttpStatus.NOT_FOUND);
         }
     }
 
@@ -66,7 +67,7 @@ public class StageResultService {
             //todo Key (stage_result_id)=(1) is still referenced from table "stage".
             stageResultRepository.deleteById(id);
         } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+            throw new StageResultException("Stage result not found", HttpStatus.NOT_FOUND);
         }
     }
 

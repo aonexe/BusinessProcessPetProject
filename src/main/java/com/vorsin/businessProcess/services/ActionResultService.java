@@ -2,6 +2,7 @@ package com.vorsin.businessProcess.services;
 
 import com.vorsin.businessProcess.dto.ActionResultRequest;
 import com.vorsin.businessProcess.dto.ActionResultResponse;
+import com.vorsin.businessProcess.exception.ActionResultException;
 import com.vorsin.businessProcess.models.ActionResult;
 import com.vorsin.businessProcess.repositories.ActionResultRepository;
 import com.vorsin.businessProcess.repositories.UserRepository;
@@ -57,7 +58,7 @@ public class ActionResultService {
             modifyActionResult(actionResult.get(), actionResultRequest.getName());
             actionResultRepository.save(actionResult.get());
         } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+            throw new ActionResultException("Action result not found", HttpStatus.NOT_FOUND);
         }
     }
 
@@ -66,7 +67,7 @@ public class ActionResultService {
             //todo Key (action_result_id)=(1) is still referenced from table "action".
             actionResultRepository.deleteById(id);
         } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+            throw new ActionResultException("Action result not found", HttpStatus.NOT_FOUND);
         }
     }
 

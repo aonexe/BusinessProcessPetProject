@@ -2,7 +2,8 @@ package com.vorsin.businessProcess.services;
 
 import com.vorsin.businessProcess.dto.StageRelationRequest;
 import com.vorsin.businessProcess.dto.StageRelationResponse;
-import com.vorsin.businessProcess.exception.StageNotFoundException;
+import com.vorsin.businessProcess.exception.StageException;
+import com.vorsin.businessProcess.exception.StageRelationException;
 import com.vorsin.businessProcess.models.Stage;
 import com.vorsin.businessProcess.models.StageRelation;
 import com.vorsin.businessProcess.repositories.StageRelationRepository;
@@ -94,7 +95,7 @@ public class StageRelationService {
             stageRelationRepository.save(stageRelation.get());
 
         } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+            throw new StageRelationException("Stage relation not found", HttpStatus.NOT_FOUND);
         }
     }
 
@@ -102,7 +103,7 @@ public class StageRelationService {
         if (stageRelationRepository.existsById(id)) {
             stageRelationRepository.deleteById(id);
         } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+            throw new StageRelationException("Stage relation not found", HttpStatus.NOT_FOUND);
         }
     }
 
@@ -149,7 +150,7 @@ public class StageRelationService {
     private void checkIfStagesExists(List<Integer> listID) {
         for (int id : listID) {
             if (!stageRepository.existsById(id)) {
-                throw new StageNotFoundException("Stage not found");
+                throw new StageException("Stage not found", HttpStatus.NOT_FOUND);
             }
         }
     }

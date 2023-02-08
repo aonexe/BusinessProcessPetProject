@@ -2,6 +2,7 @@ package com.vorsin.businessProcess.services;
 
 import com.vorsin.businessProcess.dto.UserRequest;
 import com.vorsin.businessProcess.dto.UserResponse;
+import com.vorsin.businessProcess.exception.UserException;
 import com.vorsin.businessProcess.models.User;
 import com.vorsin.businessProcess.models.UserRoleEnum;
 import com.vorsin.businessProcess.repositories.UserRepository;
@@ -59,7 +60,7 @@ public class UserService {
                     userRequest.getEmail(), userRequest.getUsername(), userRequest.getPassword());
             userRepository.save(user);
         } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+            throw new UserException("User not found", HttpStatus.NOT_FOUND);
         }
     }
 
@@ -69,7 +70,7 @@ public class UserService {
             //todo Key  is still referenced from table
             userRepository.deleteById(id);
         } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+            throw new UserException("User not found", HttpStatus.NOT_FOUND);
         }
     }
 

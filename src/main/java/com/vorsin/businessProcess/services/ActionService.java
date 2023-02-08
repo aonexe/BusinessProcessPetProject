@@ -2,6 +2,7 @@ package com.vorsin.businessProcess.services;
 
 import com.vorsin.businessProcess.dto.ActionRequest;
 import com.vorsin.businessProcess.dto.ActionResponse;
+import com.vorsin.businessProcess.exception.ActionException;
 import com.vorsin.businessProcess.models.Action;
 import com.vorsin.businessProcess.models.Stage;
 import com.vorsin.businessProcess.models.User;
@@ -53,7 +54,7 @@ public class ActionService {
             modifyAction(action.get(), actionRequest.getStageId(), actionRequest.getTaskOwnerId());
             actionRepository.save(action.get());
         } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+            throw new ActionException("Action not found", HttpStatus.NOT_FOUND);
         }
     }
 
@@ -61,7 +62,7 @@ public class ActionService {
         if (actionRepository.existsById(id)) {
             actionRepository.deleteById(id);
         } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+            throw new ActionException("Action not found", HttpStatus.NOT_FOUND);
         }
     }
 
