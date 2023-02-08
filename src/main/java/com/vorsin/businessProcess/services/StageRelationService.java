@@ -48,8 +48,7 @@ public class StageRelationService {
 
         // Проверяем, что связь не зацикливается на этапе
         if (stageRelationRequest.getFromStageId() == stageRelationRequest.getToStageId())
-            //todo custom exception
-            throw new RuntimeException("same stage");
+            throw new StageRelationException("Relation is in the same stage");
 
         // Проверяем, что такой связи нет
         checkIfStageRelationDoesntExist(stageRelationRequest.getFromStageId(), stageRelationRequest.getToStageId());
@@ -76,8 +75,7 @@ public class StageRelationService {
 
             // Проверяем, что связь не зацикливается на этапе
             if (stageRelationRequest.getFromStageId() == stageRelationRequest.getToStageId())
-                //todo custom exception
-                throw new RuntimeException("same stage");
+                throw new StageRelationException("Relation is in the same stage");
 
             //Проверяем, что такой связи нет
             checkIfStageRelationDoesntExist(stageRelationRequest.getFromStageId(), stageRelationRequest.getToStageId());
@@ -161,16 +159,13 @@ public class StageRelationService {
         int bpIdToStage = stageRepository.findProcessIdByStageId(toStageId);
 
         if (bpIdFromStage != bpIdToStage) {
-            //todo
-            throw new RuntimeException("stages from different bp!!!");
+            throw new StageException("Stages from different business process");
         }
     }
 
     private void checkIfStageRelationDoesntExist(int fromStageId, int toStageId) {
-        //todo
         if (stageRelationRepository.findStageRelationIfExists(fromStageId, toStageId).isPresent())
-            //todo custom exception
-            throw new ResponseStatusException(HttpStatus.CONFLICT);
+            throw new StageRelationException("Stage relation already exists", HttpStatus.CONFLICT);
     }
 
     private String generateTitle(int fromStageId, int toStageId) {

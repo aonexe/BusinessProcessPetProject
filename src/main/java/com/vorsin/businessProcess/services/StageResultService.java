@@ -41,7 +41,7 @@ public class StageResultService {
 
     public void createStageResult(StageResultRequest stageResultRequest) {
         if (stageResultRepository.findByName(stageResultRequest.getName()).isPresent()) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT);
+            throw new StageResultException("Stage result already exists", HttpStatus.CONFLICT);
         }
         StageResult newStageResult = new StageResult(stageResultRequest.getName());
         initNewStageResult(newStageResult);
@@ -76,7 +76,6 @@ public class StageResultService {
         newStageResult.setCreatedAt(LocalDateTime.now());
         //todo current user from auth
         newStageResult.setCreatedWho(userRepository.findById(1).get());
-        //todo check
     }
 
     private void modifyStageResult(StageResult stageResult, String name) {
@@ -85,7 +84,6 @@ public class StageResultService {
         stageResult.setUpdatedAt(LocalDateTime.now());
         //todo current user from auth
         stageResult.setUpdatedWho(userRepository.findById(1).get());
-
     }
 
 }

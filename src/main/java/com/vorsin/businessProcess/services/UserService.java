@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -39,9 +38,10 @@ public class UserService {
 
     @Transactional
     public void createUser(UserRequest userRequest) {
-        if (userRepository.existsByUsernameOrEmail(userRequest.getUsername(), userRequest.getEmail())) {
-            //todo custom status
-            throw new ResponseStatusException(HttpStatus.CONFLICT);
+        if (userRepository.existsByUsername(userRequest.getUsername())) {
+            throw new UserException("User with this username already exists", HttpStatus.CONFLICT);
+        } else if (userRepository.existsByEmail(userRequest.getEmail())) {
+            throw new UserException("User with this email already exists", HttpStatus.CONFLICT);
         } else {
             User newUser = modelMapper.map(userRequest, User.class);
             initNewUser(newUser);
@@ -53,7 +53,7 @@ public class UserService {
     public void updateUser(int id, UserRequest userRequest) {
         if (userRepository.existsById(id)) {
             if (userRepository.existsByUsernameOrEmail(userRequest.getUsername(), userRequest.getEmail())) {
-                throw new ResponseStatusException(HttpStatus.CONFLICT);
+                throw new UserException("User already exists", HttpStatus.CONFLICT);
             }
             User user = userRepository.findById(id).get();
             modifyUser(user, userRequest.getFirstName(), userRequest.getLastName(), userRequest.getDateOfBirth(),

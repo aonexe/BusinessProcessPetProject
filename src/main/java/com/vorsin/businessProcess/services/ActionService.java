@@ -3,6 +3,8 @@ package com.vorsin.businessProcess.services;
 import com.vorsin.businessProcess.dto.ActionRequest;
 import com.vorsin.businessProcess.dto.ActionResponse;
 import com.vorsin.businessProcess.exception.ActionException;
+import com.vorsin.businessProcess.exception.StageException;
+import com.vorsin.businessProcess.exception.UserException;
 import com.vorsin.businessProcess.models.Action;
 import com.vorsin.businessProcess.models.Stage;
 import com.vorsin.businessProcess.models.User;
@@ -13,7 +15,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -93,8 +94,7 @@ public class ActionService {
     private Stage getStageIfExists(int stageId) {
         Optional<Stage> stage = stageRepository.findById(stageId);
         if (stage.isEmpty()) {
-            //todo
-            throw new RuntimeException("stage not found");
+            throw new StageException("Stage not found", HttpStatus.NOT_FOUND);
         }
         return stage.get();
     }
@@ -102,8 +102,7 @@ public class ActionService {
     private User getUserIfExists(int userId) {
         Optional<User> user = userRepository.findById(userId);
         if (user.isEmpty()) {
-            //todo
-            throw new RuntimeException("user not found");
+            throw new UserException("User not found", HttpStatus.NOT_FOUND);
         }
         return user.get();
     }

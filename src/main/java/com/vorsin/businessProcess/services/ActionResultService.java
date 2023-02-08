@@ -76,7 +76,6 @@ public class ActionResultService {
         newActionResult.setCreatedAt(LocalDateTime.now());
         //todo current user from auth
         newActionResult.setCreatedWho(userRepository.findById(1).get());
-        //todo check
     }
 
     private void modifyActionResult(ActionResult actionResult, String name) {
@@ -85,7 +84,6 @@ public class ActionResultService {
         actionResult.setUpdatedAt(LocalDateTime.now());
         //todo current user from auth
         actionResult.setUpdatedWho(userRepository.findById(1).get());
-
     }
 
 }

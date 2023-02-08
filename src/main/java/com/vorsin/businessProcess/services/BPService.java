@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -39,16 +38,15 @@ public class BPService {
 
     @Transactional
     public void createBusinessProcess(BPRequest bpRequest) {
-        if (bpRequest.getTitle().isBlank()) {
-
-            //todo
-            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY);
+        String requestTitle = bpRequest.getTitle().trim();
+        if (requestTitle.isBlank()) {
+            throw new BusinessProcessException("Title is empty");
         }
         if (bpRepository.existsByTitle(bpRequest.getTitle())) {
-            //todo custom exception
-            throw new ResponseStatusException(HttpStatus.CONFLICT);
+            throw new BusinessProcessException("Title already exists", HttpStatus.CONFLICT);
         } else {
             BusinessProcess newBusinessProcess = modelMapper.map(bpRequest, BusinessProcess.class);
+            newBusinessProcess.setTitle(requestTitle);
             initNewBusinessProcess(newBusinessProcess);
             bpRepository.save(newBusinessProcess);
         }
@@ -57,9 +55,8 @@ public class BPService {
     @Transactional
     public void updateBusinessProcess(int id, BPRequest bpRequest) {
         if (bpRepository.existsById(id)) {
-            //todo custom exception
-            if (bpRepository.existsByTitle(bpRequest.getTitle())) {
-                throw new ResponseStatusException(HttpStatus.CONFLICT);
+            if (bpRepository.existsByTitle(bpRequest.getTitle().trim())) {
+                throw new BusinessProcessException("Title already exists", HttpStatus.CONFLICT);
             }
             BusinessProcess businessProcess = bpRepository.findById(id).get();
             modifyBusinessProcess(businessProcess, bpRequest.getTitle());
@@ -90,7 +87,6 @@ public class BPService {
 
         businessProcess.setTitle(title);
 
-        //todo
         businessProcess.setUpdatedAt(LocalDateTime.now());
         //todo current user from auth
         businessProcess.setUpdatedWho(userRepository.findById(1).get());
