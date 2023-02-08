@@ -149,7 +149,6 @@ public class StageRelationService {
     private void checkIfStagesExists(List<Integer> listID) {
         for (int id : listID) {
             if (!stageRepository.existsById(id)) {
-                //todo
                 throw new StageNotFoundException("Stage not found");
             }
         }
