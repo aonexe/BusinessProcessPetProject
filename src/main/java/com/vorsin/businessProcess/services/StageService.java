@@ -2,6 +2,7 @@ package com.vorsin.businessProcess.services;
 
 import com.vorsin.businessProcess.dto.StageRequest;
 import com.vorsin.businessProcess.dto.StageResponse;
+import com.vorsin.businessProcess.exception.BusinessProcessNotFoundException;
 import com.vorsin.businessProcess.models.Stage;
 import com.vorsin.businessProcess.repositories.BPRepository;
 import com.vorsin.businessProcess.repositories.StageRepository;
@@ -94,7 +95,7 @@ public class StageService {
 
     private void checkIfBusinessProcessExists(int businessProcessId) {
         if (!bpRepository.existsById(businessProcessId)) {
-            throw new RuntimeException("bp not found");
+            throw new BusinessProcessNotFoundException("Business process not found");
         }
     }
 

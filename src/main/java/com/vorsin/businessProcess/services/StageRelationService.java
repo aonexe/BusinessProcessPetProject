@@ -2,6 +2,7 @@ package com.vorsin.businessProcess.services;
 
 import com.vorsin.businessProcess.dto.StageRelationRequest;
 import com.vorsin.businessProcess.dto.StageRelationResponse;
+import com.vorsin.businessProcess.exception.StageNotFoundException;
 import com.vorsin.businessProcess.models.Stage;
 import com.vorsin.businessProcess.models.StageRelation;
 import com.vorsin.businessProcess.repositories.StageRelationRepository;
@@ -149,7 +150,7 @@ public class StageRelationService {
         for (int id : listID) {
             if (!stageRepository.existsById(id)) {
                 //todo
-                throw new RuntimeException("Stage not found");
+                throw new StageNotFoundException("Stage not found");
             }
         }
     }
