@@ -2,11 +2,8 @@ package com.vorsin.businessProcess.models;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -30,9 +27,10 @@ public class Action {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "action_result")
-    @Enumerated(EnumType.STRING)
-    private ActionResultEnum actionResult;
+    @JoinColumn(name = "action_result_id", referencedColumnName = "action_result_id")
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JsonBackReference
+    private ActionResult actionResult;
 
     @Column(name = "created_at")
     @NotNull(message = "Created at time should not be empty")

@@ -2,6 +2,8 @@ package com.vorsin.businessProcess.services;
 
 import com.vorsin.businessProcess.dto.StageRelationRequest;
 import com.vorsin.businessProcess.dto.StageRelationResponse;
+import com.vorsin.businessProcess.exception.StageException;
+import com.vorsin.businessProcess.exception.StageRelationException;
 import com.vorsin.businessProcess.models.Stage;
 import com.vorsin.businessProcess.models.StageRelation;
 import com.vorsin.businessProcess.repositories.StageRelationRepository;
@@ -44,6 +46,13 @@ public class StageRelationService {
 
     public void createStageRelation(StageRelationRequest stageRelationRequest) {
 
+        // Проверяем, что связь не зацикливается на этапе
+        if (stageRelationRequest.getFromStageId() == stageRelationRequest.getToStageId())
+            throw new StageRelationException("Relation is in the same stage");
+
+        // Проверяем, что такой связи нет
+        checkIfStageRelationDoesntExist(stageRelationRequest.getFromStageId(), stageRelationRequest.getToStageId());
+
         // Проверяем, что Stages существуют
         List<Integer> stagesId = new ArrayList<>
                 (Arrays.asList(stageRelationRequest.getFromStageId(), stageRelationRequest.getToStageId()));
@@ -64,6 +73,13 @@ public class StageRelationService {
         Optional<StageRelation> stageRelation = stageRelationRepository.findById(id);
         if (stageRelation.isPresent()) {
 
+            // Проверяем, что связь не зацикливается на этапе
+            if (stageRelationRequest.getFromStageId() == stageRelationRequest.getToStageId())
+                throw new StageRelationException("Relation is in the same stage");
+
+            //Проверяем, что такой связи нет
+            checkIfStageRelationDoesntExist(stageRelationRequest.getFromStageId(), stageRelationRequest.getToStageId());
+
             // Проверяем, что Stages существуют
             List<Integer> stagesId = new ArrayList<>
                     (Arrays.asList(stageRelationRequest.getFromStageId(), stageRelationRequest.getToStageId()));
@@ -77,7 +93,7 @@ public class StageRelationService {
             stageRelationRepository.save(stageRelation.get());
 
         } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+            throw new StageRelationException("Stage relation not found", HttpStatus.NOT_FOUND);
         }
     }
 
@@ -85,7 +101,7 @@ public class StageRelationService {
         if (stageRelationRepository.existsById(id)) {
             stageRelationRepository.deleteById(id);
         } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+            throw new StageRelationException("Stage relation not found", HttpStatus.NOT_FOUND);
         }
     }
 
@@ -106,13 +122,12 @@ public class StageRelationService {
 
         newStageRelation.setCreatedAt(LocalDateTime.now());
         //todo current user from auth
-        newStageRelation.setCreatedWho(userRepository.findById(2).get());
+        newStageRelation.setCreatedWho(userRepository.findById(1).get());
     }
 
     private void modifyStageRelation(StageRelation stageRelation, String title, int fromStageId, int toStageId) {
 
         // Обновляем Title, если указали новый
-
         if (title != null && !title.equals(stageRelation.getTitle())) {
             stageRelation.setTitle(title);
         }
@@ -122,7 +137,7 @@ public class StageRelationService {
 
         stageRelation.setUpdatedAt(LocalDateTime.now());
         //todo current user from auth
-        stageRelation.setUpdatedWho(userRepository.findById(2).get());
+        stageRelation.setUpdatedWho(userRepository.findById(1).get());
 
     }
 
@@ -133,8 +148,7 @@ public class StageRelationService {
     private void checkIfStagesExists(List<Integer> listID) {
         for (int id : listID) {
             if (!stageRepository.existsById(id)) {
-                //todo
-                throw new RuntimeException("Stage not found");
+                throw new StageException("Stage not found", HttpStatus.NOT_FOUND);
             }
         }
     }
@@ -145,9 +159,13 @@ public class StageRelationService {
         int bpIdToStage = stageRepository.findProcessIdByStageId(toStageId);
 
         if (bpIdFromStage != bpIdToStage) {
-            //todo
-            throw new RuntimeException("stages from different bp!!!");
+            throw new StageException("Stages from different business process");
         }
+    }
+
+    private void checkIfStageRelationDoesntExist(int fromStageId, int toStageId) {
+        if (stageRelationRepository.findStageRelationIfExists(fromStageId, toStageId).isPresent())
+            throw new StageRelationException("Stage relation already exists", HttpStatus.CONFLICT);
     }
 
     private String generateTitle(int fromStageId, int toStageId) {

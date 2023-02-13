@@ -1,19 +1,14 @@
 package com.vorsin.businessProcess.models;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
@@ -25,25 +20,19 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Table(name = "stage")
+@Table(name = "stage_result")
 @Data
-public class Stage {
+public class StageResult {
 
     @Id
-    @Column(name = "stage_id")
+    @Column(name = "stage_result_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "title")
-    @NotNull(message = "Title should not be empty")
-    @Size(max = 30, message = "Title should be less than 30 characters")
-    private String title;
-
-    @JoinColumn(name = "stage_result_id", referencedColumnName = "stage_result_id")
-    @ManyToOne(fetch = FetchType.EAGER)
-    @NotNull(message = "Stage result should not be empty")
-    @JsonBackReference
-    private StageResult stageResult;
+    @Column(name = "stage_result_name")
+    @NotNull(message = "Name should not be empty")
+    @Size(max = 30, message = "Name should be less than 30 characters")
+    private String name;
 
     @Column(name = "created_at")
     @NotNull(message = "Created at time should not be empty")
@@ -65,24 +54,12 @@ public class Stage {
     @JsonIgnore
     private User updatedWho;
 
-    @JoinColumn(name = "business_process_id", referencedColumnName = "business_process_id")
-    @ManyToOne(fetch = FetchType.LAZY)
-    @NotNull(message = "Business process should not be empty")
-    @JsonBackReference
-    private BusinessProcess businessProcess;
-
-    @OneToMany(mappedBy = "stage", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "stageResult", fetch = FetchType.LAZY)
     @JsonManagedReference
-    private List<Action> actions;
+    private List<Stage> stages;
 
-    @OneToMany(mappedBy = "fromStage", fetch = FetchType.LAZY)
-    @JsonManagedReference
-    private List<StageRelation> stageRelationsFrom;
-
-    @OneToMany(mappedBy = "toStage", fetch = FetchType.LAZY)
-    @JsonManagedReference
-    private List<StageRelation> stageRelationsTo;
-
+    public StageResult() {}
+    public StageResult(String name) {
+        this.name = name;
+    }
 }
-
-

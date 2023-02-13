@@ -2,6 +2,7 @@ package com.vorsin.businessProcess.services;
 
 import com.vorsin.businessProcess.dto.BPRequest;
 import com.vorsin.businessProcess.dto.BPResponse;
+import com.vorsin.businessProcess.exception.BusinessProcessException;
 import com.vorsin.businessProcess.models.BusinessProcess;
 import com.vorsin.businessProcess.repositories.BPRepository;
 import com.vorsin.businessProcess.repositories.UserRepository;
@@ -10,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -38,16 +38,15 @@ public class BPService {
 
     @Transactional
     public void createBusinessProcess(BPRequest bpRequest) {
-        if (bpRequest.getTitle().trim().equals("")) {
-
-            //todo
-            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY);
+        String requestTitle = bpRequest.getTitle().trim();
+        if (requestTitle.isBlank()) {
+            throw new BusinessProcessException("Title is empty");
         }
         if (bpRepository.existsByTitle(bpRequest.getTitle())) {
-            //todo custom exception
-            throw new ResponseStatusException(HttpStatus.CONFLICT);
+            throw new BusinessProcessException("Title already exists", HttpStatus.CONFLICT);
         } else {
             BusinessProcess newBusinessProcess = modelMapper.map(bpRequest, BusinessProcess.class);
+            newBusinessProcess.setTitle(requestTitle);
             initNewBusinessProcess(newBusinessProcess);
             bpRepository.save(newBusinessProcess);
         }
@@ -56,15 +55,14 @@ public class BPService {
     @Transactional
     public void updateBusinessProcess(int id, BPRequest bpRequest) {
         if (bpRepository.existsById(id)) {
-            //todo custom exception
-            if (bpRepository.existsByTitle(bpRequest.getTitle())) {
-                throw new ResponseStatusException(HttpStatus.CONFLICT);
+            if (bpRepository.existsByTitle(bpRequest.getTitle().trim())) {
+                throw new BusinessProcessException("Title already exists", HttpStatus.CONFLICT);
             }
             BusinessProcess businessProcess = bpRepository.findById(id).get();
             modifyBusinessProcess(businessProcess, bpRequest.getTitle());
             bpRepository.save(businessProcess);
         } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+            throw new BusinessProcessException("Business process not found", HttpStatus.NOT_FOUND);
         }
     }
 
@@ -73,7 +71,7 @@ public class BPService {
         if (bpRepository.existsById(id)) {
             bpRepository.deleteById(id);
         } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+            throw new BusinessProcessException("Business process not found", HttpStatus.NOT_FOUND);
         }
     }
 
@@ -82,17 +80,16 @@ public class BPService {
         newBusinessProcess.setCreatedAt(LocalDateTime.now());
 
         //todo current user from auth
-        newBusinessProcess.setCreatedWho(userRepository.findById(2).get());
+        newBusinessProcess.setCreatedWho(userRepository.findById(1).get());
     }
 
     private void modifyBusinessProcess(BusinessProcess businessProcess, String title) {
 
         businessProcess.setTitle(title);
 
-        //todo
         businessProcess.setUpdatedAt(LocalDateTime.now());
         //todo current user from auth
-        businessProcess.setUpdatedWho(userRepository.findById(2).get());
+        businessProcess.setUpdatedWho(userRepository.findById(1).get());
     }
 
 }

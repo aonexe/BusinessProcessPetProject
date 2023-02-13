@@ -25,6 +25,7 @@
 		<javax.servlet.api.version>4.0.1</javax.servlet.api.version>
 <springdoc.openapi.starter.webmvc-ui.version>2.0.0</springdoc.openapi.starter.webmvc-ui.version>
 	</properties>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
