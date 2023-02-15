@@ -1,0 +1,5 @@
+ALTER TABLE bp_user
+    ALTER COLUMN password TYPE VARCHAR;
+
+ALTER TABLE bp_user
+    ALTER COLUMN password SET NOT NULL;

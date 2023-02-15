@@ -3,16 +3,19 @@ package com.vorsin.businessProcess.services;
 import com.vorsin.businessProcess.dto.UserRequest;
 import com.vorsin.businessProcess.dto.UserResponse;
 import com.vorsin.businessProcess.exception.UserException;
+import com.vorsin.businessProcess.models.Role;
 import com.vorsin.businessProcess.models.User;
-import com.vorsin.businessProcess.models.UserRoleEnum;
+import com.vorsin.businessProcess.repositories.RoleRepository;
 import com.vorsin.businessProcess.repositories.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,11 +25,15 @@ import java.util.stream.Collectors;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final PasswordEncoder passwordEncoder;
     private final ModelMapper modelMapper;
 
     @Autowired
-    public UserService(UserRepository userRepository, ModelMapper modelMapper) {
+    public UserService(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder, ModelMapper modelMapper) {
         this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
+        this.passwordEncoder = passwordEncoder;
         this.modelMapper = modelMapper;
     }
 
@@ -43,8 +50,18 @@ public class UserService {
         } else if (userRepository.existsByEmail(userRequest.getEmail())) {
             throw new UserException("User with this email already exists", HttpStatus.CONFLICT);
         } else {
-            User newUser = modelMapper.map(userRequest, User.class);
-            initNewUser(newUser);
+            Role roles = roleRepository.findByName("USER").get();
+            var newUser = new User()
+                    .firstName(userRequest.getFirstName())
+                    .lastName(userRequest.getLastName())
+                    .dateOfBirth(userRequest.getDateOfBirth())
+                    .email(userRequest.getEmail())
+                    .username(userRequest.getUsername())
+                    .password(passwordEncoder.encode(userRequest.getPassword()))
+                    .roles(Collections.singletonList(roles))
+                    .createdAt(LocalDateTime.now())
+                    // todo current user from auth
+                    .createdWho(userRepository.findById(1).get());
             userRepository.save(newUser);
         }
     }
@@ -74,25 +91,18 @@ public class UserService {
         }
     }
 
-    private void initNewUser(User newUser) {
-        newUser.setCreatedAt(LocalDateTime.now());
-        //todo current user from auth
-        newUser.setCreatedWho(userRepository.findById(1).get());
-        newUser.setUserRole(UserRoleEnum.USER);
-    }
-
     private void modifyUser(User user, String firstName, String lastName, Date dateOfBirth,
                             String email, String username, String password) {
 
-        user.setFirstName(firstName);
-        user.setLastName(lastName);
-        user.setDateOfBirth(dateOfBirth);
-        user.setEmail(email);
-        user.setUsername(username);
-        user.setPassword(password);
+        user.firstName(firstName);
+        user.lastName(lastName);
+        user.dateOfBirth(dateOfBirth);
+        user.email(email);
+        user.username(username);
+        user.password(password);
 
-        user.setUpdatedAt(LocalDateTime.now());
-        //todo current user from auth
-        user.setUpdatedWho(userRepository.findById(1).get());
+        user.updatedAt(LocalDateTime.now());
+        // todo current user from auth
+        user.updatedWho(userRepository.findById(1).get());
     }
 }
