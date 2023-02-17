@@ -35,7 +35,6 @@ public class UserRequest {
     private String username;
 
     @NotNull(message = "Password should be not empty")
-    @Size(min = 8, max = 50, message = "Password should be between 8 and 50 characters")
     private String password;
     
 }

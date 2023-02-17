@@ -3,7 +3,6 @@ package com.vorsin.businessProcess.services;
 import com.vorsin.businessProcess.dto.UserRequest;
 import com.vorsin.businessProcess.dto.UserResponse;
 import com.vorsin.businessProcess.exception.UserException;
-import com.vorsin.businessProcess.models.Role;
 import com.vorsin.businessProcess.models.User;
 import com.vorsin.businessProcess.repositories.RoleRepository;
 import com.vorsin.businessProcess.repositories.UserRepository;
@@ -18,6 +17,7 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -38,7 +38,7 @@ public class UserService {
     }
 
     public List<UserResponse> getUsers() {
-        return userRepository.findAll()
+        return userRepository.findAllEnabledUser()
                 .stream().map(user -> modelMapper.map(user, UserResponse.class))
                 .collect(Collectors.toList());
     }
@@ -50,32 +50,41 @@ public class UserService {
         } else if (userRepository.existsByEmail(userRequest.getEmail())) {
             throw new UserException("User with this email already exists", HttpStatus.CONFLICT);
         } else {
-            Role roles = roleRepository.findByName("USER").get();
-            var newUser = new User()
-                    .firstName(userRequest.getFirstName())
-                    .lastName(userRequest.getLastName())
-                    .dateOfBirth(userRequest.getDateOfBirth())
-                    .email(userRequest.getEmail())
-                    .username(userRequest.getUsername())
-                    .password(passwordEncoder.encode(userRequest.getPassword()))
-                    .roles(Collections.singletonList(roles))
-                    .createdAt(LocalDateTime.now())
-                    // todo current user from auth
-                    .createdWho(userRepository.findById(1).get());
+            var newUser = new User();
+            newUser.setFirstName(userRequest.getFirstName());
+            newUser.setLastName(userRequest.getLastName());
+            newUser.setDateOfBirth(userRequest.getDateOfBirth());
+            newUser.setEmail(userRequest.getEmail());
+            newUser.setUsername(userRequest.getUsername());
+            newUser.setPassword(passwordEncoder.encode(userRequest.getPassword()));
+            newUser.setRoles(Collections.singletonList(roleRepository.findByName("USER").get()));
+            newUser.setCreatedAt(LocalDateTime.now());
+            // todo current user from auth
+            newUser.setCreatedWho(userRepository.findById(1).get());
+
             userRepository.save(newUser);
         }
     }
 
     @Transactional
     public void updateUser(int id, UserRequest userRequest) {
-        if (userRepository.existsById(id)) {
-            if (userRepository.existsByUsernameOrEmail(userRequest.getUsername(), userRequest.getEmail())) {
-                throw new UserException("User already exists", HttpStatus.CONFLICT);
+        Optional<User> user = userRepository.findById(id);
+
+        if (user.isPresent()) {
+            if (!user.get().getUsername().equalsIgnoreCase(userRequest.getUsername())) {
+                if (userRepository.existsByUsername(userRequest.getUsername())) {
+                    throw new UserException("This username is already taken", HttpStatus.CONFLICT);
+                }
             }
-            User user = userRepository.findById(id).get();
-            modifyUser(user, userRequest.getFirstName(), userRequest.getLastName(), userRequest.getDateOfBirth(),
+            if (!user.get().getEmail().equalsIgnoreCase(userRequest.getEmail())) {
+                if (userRepository.existsByEmail(userRequest.getEmail())) {
+                    throw new UserException("This email is already taken", HttpStatus.CONFLICT);
+                }
+            }
+
+            modifyUser(user.get(), userRequest.getFirstName(), userRequest.getLastName(), userRequest.getDateOfBirth(),
                     userRequest.getEmail(), userRequest.getUsername(), userRequest.getPassword());
-            userRepository.save(user);
+            userRepository.save(user.get());
         } else {
             throw new UserException("User not found", HttpStatus.NOT_FOUND);
         }
@@ -83,9 +92,14 @@ public class UserService {
 
     @Transactional
     public void deleteUser(int id) {
-        if (userRepository.existsById(id)) {
+        Optional<User> user = userRepository.findById(id);
+        if (user.isPresent()) {
+            if (user.get().isEnabled()) {
+                userRepository.disableUserById(id);
+            } else {
+                throw new UserException("User not found", HttpStatus.NOT_FOUND);
+            }
             //todo Key  is still referenced from table
-            userRepository.deleteById(id);
         } else {
             throw new UserException("User not found", HttpStatus.NOT_FOUND);
         }
@@ -94,15 +108,15 @@ public class UserService {
     private void modifyUser(User user, String firstName, String lastName, Date dateOfBirth,
                             String email, String username, String password) {
 
-        user.firstName(firstName);
-        user.lastName(lastName);
-        user.dateOfBirth(dateOfBirth);
-        user.email(email);
-        user.username(username);
-        user.password(password);
+        user.setFirstName(firstName);
+        user.setLastName(lastName);
+        user.setDateOfBirth(dateOfBirth);
+        user.setEmail(email);
+        user.setUsername(username);
+        user.setPassword(passwordEncoder.encode(password));
 
-        user.updatedAt(LocalDateTime.now());
+        user.setUpdatedAt(LocalDateTime.now());
         // todo current user from auth
-        user.updatedWho(userRepository.findById(1).get());
+        user.setUpdatedWho(userRepository.findById(1).get());
     }
 }

@@ -32,7 +32,6 @@ import java.util.List;
 @Entity
 @Table(name = "bp_user")
 @Data
-@Accessors(chain = true, fluent = true)
 public class User {
 
     @Id
@@ -74,6 +73,8 @@ public class User {
     @JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "role_id"))
     private List<Role> roles = new ArrayList<>();
+
+    private boolean enabled;
 
     @Column(name = "created_at")
     @NotNull(message = "Created at time should not be empty")
