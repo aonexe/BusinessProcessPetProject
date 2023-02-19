@@ -31,12 +31,14 @@ public class SecurityConfig {
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
-//        http
-//                .authorizeHttpRequests()
-//                .anyRequest().permitAll();
+        http
+                .authorizeHttpRequests()
+                .requestMatchers("/auth/sign-up").permitAll()
+                .requestMatchers("/auth/sign-in").permitAll()
+                .anyRequest().authenticated();
 
-//        http
-//                .httpBasic();
+        http
+                .httpBasic();
 
 
         return http.build();

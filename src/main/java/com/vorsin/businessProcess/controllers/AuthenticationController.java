@@ -30,13 +30,13 @@ public class AuthenticationController {
     }
 
 
-    @PostMapping("/registration")
+    @PostMapping("/sign-up")
     public ResponseEntity<HttpStatus> register(@RequestBody @Valid UserRequest userRequest) {
         userService.createUser(userRequest);
         return ResponseEntity.ok(HttpStatus.CREATED);
     }
 
-    @PostMapping("login")
+    @PostMapping("/sign-in")
     public ResponseEntity<String> login(@RequestBody LoginDto loginDto) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(

@@ -6,6 +6,7 @@ import com.vorsin.businessProcess.exception.UserException;
 import com.vorsin.businessProcess.models.User;
 import com.vorsin.businessProcess.repositories.RoleRepository;
 import com.vorsin.businessProcess.repositories.UserRepository;
+import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -44,7 +45,7 @@ public class UserService {
     }
 
     @Transactional
-    public void createUser(UserRequest userRequest) {
+    public void createUser(@Valid UserRequest userRequest) {
         if (userRepository.existsByUsername(userRequest.getUsername())) {
             throw new UserException("User with this username already exists", HttpStatus.CONFLICT);
         } else if (userRepository.existsByEmail(userRequest.getEmail())) {

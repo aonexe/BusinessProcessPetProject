@@ -18,9 +18,9 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     @Query(value = "SELECT * FROM bp_user WHERE enabled = TRUE", nativeQuery = true)
     List<User> findAllEnabledUser();
 
-    @Modifying(clearAutomatically=true)
+    @Modifying(clearAutomatically = true)
     @Query(value = "UPDATE User u SET u.enabled = false WHERE u.id = :userId")
-    void disableUserById(@Param("userId") int userId );
+    void disableUserById(@Param("userId") int userId);
 
     boolean existsByUsername(String username);
 
