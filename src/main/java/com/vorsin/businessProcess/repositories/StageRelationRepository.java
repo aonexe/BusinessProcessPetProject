@@ -4,9 +4,11 @@ import com.vorsin.businessProcess.models.StageRelation;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
+@Repository
 public interface StageRelationRepository extends JpaRepository<StageRelation, Integer> {
 
     @Query(value = "SELECT *  FROM stage_relation WHERE from_stage =:fromStageId AND to_stage =:toStageId",

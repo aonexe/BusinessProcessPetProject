@@ -70,7 +70,7 @@ public class ActionService {
     private void initNewAction(Action newAction, int stageId, int taskOwnerId) {
 
         newAction.setStage(getStageIfExists(stageId));
-        newAction.setTaskOwner(getUserIfExists(taskOwnerId));
+        newAction.setTaskOwner(getUserIfExistsAndEnabled(taskOwnerId));
 
         newAction.setCreatedAt(LocalDateTime.now());
         // todo current user from auth
@@ -83,7 +83,7 @@ public class ActionService {
 
         action.setStage(getStageIfExists(stageId));
 
-        action.setTaskOwner(getUserIfExists(taskOwnerId));
+        action.setTaskOwner(getUserIfExistsAndEnabled(taskOwnerId));
 
         action.setUpdatedAt(LocalDateTime.now());
         //todo current user from auth
@@ -99,9 +99,12 @@ public class ActionService {
         return stage.get();
     }
 
-    private User getUserIfExists(int userId) {
+    private User getUserIfExistsAndEnabled(int userId) {
         Optional<User> user = userRepository.findById(userId);
         if (user.isEmpty()) {
+            throw new UserException("User not found", HttpStatus.NOT_FOUND);
+        }
+        if (!user.get().isEnabled()) {
             throw new UserException("User not found", HttpStatus.NOT_FOUND);
         }
         return user.get();

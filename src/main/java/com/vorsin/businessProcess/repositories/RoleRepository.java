@@ -1,14 +1,14 @@
 package com.vorsin.businessProcess.repositories;
 
-import com.vorsin.businessProcess.models.ActionResult;
+import com.vorsin.businessProcess.models.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
 @Repository
-public interface ActionResultRepository extends JpaRepository<ActionResult, Integer> {
+public interface RoleRepository extends JpaRepository<Role,Integer> {
 
-    Optional<ActionResult> findByName(String name);
+    Optional<Role> findByName(String name);
 
 }

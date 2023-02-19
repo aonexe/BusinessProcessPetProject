@@ -1,6 +1,8 @@
 package com.vorsin.businessProcess.dto;
 
-import com.vorsin.businessProcess.models.UserRoleEnum;
+import com.vorsin.businessProcess.models.Role;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Past;
@@ -9,7 +11,9 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
@@ -38,6 +42,8 @@ public class UserResponse {
     @Size(min = 2, max = 30, message = "Username should be between 2 and 30 characters")
     private String username;
 
-    private UserRoleEnum userRole;
+    @JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "role_id"))
+    private List<Role> roles = new ArrayList<>();
 
 }
